@@ -93,27 +93,10 @@
             parent: editorContainer
         });
 
-        sandbox = await Sandbox.create({}, { frameContainer: iFrameContainer, frameClassName: "result-iframe" }).promise;
-
-        /*
-        sandbox.run(`
-            let canvas = document.createElement("canvas");
-            canvas.style.backgroundColor = "white";
-            canvas.style.top = "0px";
-            canvas.style.left = "0px";
-            canvas.style.position = "absolute";
-            canvas.width = 600;
-            canvas.height = 600;
-            document.body.appendChild(canvas);
-
-            let raf;
-            let ctx = canvas.getContext("2d");
-            let frameCount = 0;
-
-            let draw = function () {};
-            let timeoutId = -1;
-        `);
-        */
+        sandbox = await Sandbox.create({}, { 
+            frameContainer: iFrameContainer, 
+            frameClassName: "result-iframe" 
+        }).promise;
 
         sandbox.importScript("/ski.js");
 
