@@ -1,1 +1,1 @@
-# multiplayer-desmos
+# multiplayer-code-editor
