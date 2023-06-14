@@ -94,7 +94,7 @@
             frameClassName: "result-iframe" 
         }).promise;
 
-        sandbox.importScript("./ski.js");
+        sandbox.importScript("/code-together/ski.js")
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
@@ -162,4 +162,3 @@
         border: 1px solid black;
     }
 </style>
-
