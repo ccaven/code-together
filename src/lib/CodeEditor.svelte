@@ -58,7 +58,7 @@
         
         const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
             signaling: [
-                'ws://localhost:4444'
+                'ws://ec2-35-169-117-245.compute-1.amazonaws.com:4444'
             ]
         });
 
