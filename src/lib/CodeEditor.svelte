@@ -56,11 +56,7 @@
 
         const ydoc = new Y.Doc();
         
-        const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
-            signaling: [
-                'ws://ec2-35-169-117-245.compute-1.amazonaws.com:4444'
-            ]
-        });
+        const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc);
 
         const ytext = ydoc.getText('codemirror');
 
