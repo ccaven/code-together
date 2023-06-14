@@ -94,7 +94,7 @@
             frameClassName: "result-iframe" 
         }).promise;
 
-        sandbox.importScript("/ski.js");
+        sandbox.importScript("./ski.js");
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
