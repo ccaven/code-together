@@ -74,7 +74,7 @@
 
         let myTheme = EditorView.theme({
             "&": {
-                width: "800px",
+                width: "600px",
             },
         })
 
