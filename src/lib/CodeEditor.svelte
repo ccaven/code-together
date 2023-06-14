@@ -95,6 +95,7 @@
 
         sandbox = await Sandbox.create({}, { frameContainer: iFrameContainer, frameClassName: "result-iframe" }).promise;
 
+        /*
         sandbox.run(`
             let canvas = document.createElement("canvas");
             canvas.style.backgroundColor = "white";
@@ -111,22 +112,39 @@
 
             let draw = function () {};
             let timeoutId = -1;
-
-            /* import Processing library here */
         `);
+        */
+
+        sandbox.importScript("/ski.js");
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
-                cancelAnimationFrame(raf);
+                cancelAnimationFrame(skiJSData.raf);
 
                 ${code}
 
                 if (draw) {
-                    function loop() {
+                    frameCount = 0;
+                    delta = 1000 / 60;
+                    then = performance.now();
+                    skiJSData.start = performance.now();
+
+                    function loop(time) {
+                        skiJSData.raf = requestAnimationFrame(loop);
+                        delta = time - then
+                        let ms = 1000 / skiJSData.rate
+                        if (delta < ms) return
+                        let overflow = delta % ms
+                        then = time - overflow
+                        delta -= overflow
+
                         draw();
-                        raf = requestAnimationFrame(loop);
+
+                        frameCount += 1
+                        skiJSData.millis = performance.now() - skiJSData.start
+                        fps = 1000 / delta
                     }
-                    raf = requestAnimationFrame(loop);
+                    skiJSData.raf = requestAnimationFrame(loop);
                 }
             })()`);
         }
