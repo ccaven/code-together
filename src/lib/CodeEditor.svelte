@@ -56,7 +56,13 @@
 
         const ydoc = new Y.Doc();
         
-        const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc);
+        const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
+            signaling: [
+                "ws://ec2-34-231-169-77.compute-1.amazonaws.com:4444"
+            ]
+        });
+        
+        console.log(provider.signalingConns);
 
         const ytext = ydoc.getText('codemirror');
 
@@ -94,7 +100,7 @@
             frameClassName: "result-iframe" 
         }).promise;
 
-        sandbox.importScript("/code-together/ski.js")
+        await sandbox.importScript("ski.js")
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
