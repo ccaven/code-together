@@ -58,7 +58,7 @@
         
         const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
             signaling: [
-                "ws://ec2-34-231-169-77.compute-1.amazonaws.com:4444"
+                "ws://44.216.88.87:80"
             ]
         });
         
@@ -76,7 +76,7 @@
 
         let myTheme = EditorView.theme({
             "&": {
-                width: "600px",
+                width: "100%",
             },
         })
 
@@ -149,17 +149,22 @@
 
 </script>
 
-<div>
+<div id="total-container">
     <div bind:this={editorContainer} id="editor"></div>
     <div bind:this={iFrameContainer} id="result"></div>
-    
 </div>
 
 <style>
+    #total-container {
+        max-width: 1200px;
+        margin: auto;
+        margin-top: 2rem;
+    }
+
     div {
         display: grid;
-        grid-template-columns: auto 1fr;
-        border: 1px solid red;
+        grid-template-columns: 1fr auto;
+        border: 1px solid lightgray;
     }
 
     :global(.result-iframe) {
