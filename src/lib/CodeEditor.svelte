@@ -58,6 +58,9 @@
         
         const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
             signaling: [
+                // TODO: Replace with ws://signal-us-east-1d.xacer.dev:80
+                //       once DNS propagates and TLS comes in through
+                //       LetsEncrypt
                 "ws://44.216.88.87:80"
             ]
         });
