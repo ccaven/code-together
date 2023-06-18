@@ -95,12 +95,17 @@
             parent: editorContainer
         });
 
-        sandbox = await Sandbox.create({}, { 
-            frameContainer: iFrameContainer, 
-            frameClassName: "result-iframe" 
-        }).promise;
+        
+        async function initSandbox() {
+            sandbox = await Sandbox.create({}, { 
+                frameContainer: iFrameContainer, 
+                frameClassName: "result-iframe"
+            }).promise;
 
-        await sandbox.importScript("ski.js")
+            await sandbox.importScript("ski.js")
+        }
+
+        await initSandbox();
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
@@ -137,12 +142,16 @@
 
         let pollMs = 1000;
         let lastText = "";
+        let enabled = true;
+
         setInterval(() => {
-            let newText = view.state.doc.toString();
-            if (newText != lastText) {
-                console.log("Re-running editor");
-                runEditor(newText);
-                lastText = newText;
+            if (enabled) {
+                let newText = view.state.doc.toString();
+                if (newText != lastText) {
+                    console.log("Re-running editor");
+                    runEditor(newText);
+                    lastText = newText;
+                }
             }
         }, pollMs);
 
