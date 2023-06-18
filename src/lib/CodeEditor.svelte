@@ -100,7 +100,7 @@
             frameClassName: "result-iframe" 
         }).promise;
 
-        await sandbox.importScript("code-together/ski.js")
+        await sandbox.importScript("ski.js")
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
