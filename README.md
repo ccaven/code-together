@@ -12,8 +12,9 @@ Code Together was intended to aid small-group peer tutoring.
     - [ ] Add "Load from Khan Academy" option
     - [ ] Add "Save to Khan Academy" option
 
-- [ ] Signaling server
+- [x] Signaling server
     - [x] Fix EC2 instance to properly accept HTTP traffic
-    - [ ] Wait for DNS to propagate
-    - [ ] Order HTTPS certificate from LetsEncrypt
-    - [ ] Switch HTTP server to HTTPS (80 -> 443)
+    - [x] Wait for DNS to propagate
+    - [x] Order HTTPS certificate from LetsEncrypt
+    - [x] Switch HTTP server to HTTPS (80 -> 443)
+    - [x] Change `ws:` to `wss:` protocol
