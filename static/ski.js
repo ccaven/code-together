@@ -29,6 +29,54 @@ let background, fill, stroke, image, clear, noStroke, noFill, rect,
 
 let draw;
 
+// event handlers
+mouseReleased = () => {}
+mouseScrolled = () => {}
+mouseClicked = () => {}
+mouseOut = () => {}
+mouseOver = () => {}
+mouseMoved = () => {}
+keyPressed = () => {}
+keyReleased = () => {}
+keyTyped = () => {}
+mouseIsPressed = false
+mouseButton = LEFT_BUTTON
+mouseX = 0
+mouseY = 0
+pmouseX = mouseX
+pmouseY = mouseY
+
+BACKSPACE = 8
+TAB = 9
+ENTER = 13
+SHIFT = 16
+CONTROL = 17
+ALT = 18
+ESCAPE = 27
+SPACE = 32
+LEFT = 37
+RIGHT = 39
+UP = 38
+DOWN = 40
+//mostly for drawin' stuff on the canvas
+CORNER = 0
+CENTER = 1
+CLOSE = true
+SQUARE = atob("YnV0dA==") //yeah, srsly.
+ROUND = "round"
+PROJECT = "square"
+MITER = "iter"
+BEVEL = "bevel"
+DEGREES = "deg"
+RADIANS = "rad"
+PI = Math.PI
+TAU = PI * 2
+RGBA = "rgba"
+HSL = "hsl"
+HEX = "hex"
+LEFT_BUTTON = 0
+RIGHT_BUTTON = 2;
+
 (function () {
 
     let canvas = document.createElement("canvas");
@@ -44,39 +92,6 @@ let draw;
 
     width = canvas.width;
     height = canvas.height;
-
-    // constants
-    // KeyEvent.keyCode values
-    BACKSPACE = 8
-    TAB = 9
-    ENTER = 13
-    SHIFT = 16
-    CONTROL = 17
-    ALT = 18
-    ESCAPE = 27
-    SPACE = 32
-    LEFT = 37
-    RIGHT = 39
-    UP = 38
-    DOWN = 40
-    //mostly for drawin' stuff on the canvas
-    CORNER = 0
-    CENTER = 1
-    CLOSE = true
-    SQUARE = atob("YnV0dA==") //yeah, srsly.
-    ROUND = "round"
-    PROJECT = "square"
-    MITER = "iter"
-    BEVEL = "bevel"
-    DEGREES = "deg"
-    RADIANS = "rad"
-    PI = Math.PI
-    TAU = PI * 2
-    RGBA = "rgba"
-    HSL = "hsl"
-    HEX = "hex"
-    LEFT_BUTTON = 0
-    RIGHT_BUTTON = 2
 
     //all canvas-related functions
     /**
@@ -772,22 +787,7 @@ let draw;
         ctx.globalCompositeOperation = "source-atop"
     }
 
-    // event handlers
-    mouseReleased = () => {}
-    mouseScrolled = () => {}
-    mouseClicked = () => {}
-    mouseOut = () => {}
-    mouseOver = () => {}
-    mouseMoved = () => {}
-    keyPressed = () => {}
-    keyReleased = () => {}
-    keyTyped = () => {}
-    mouseIsPressed = false
-    mouseButton = LEFT_BUTTON
-    mouseX = 0
-    mouseY = 0
-    pmouseX = mouseX
-    pmouseY = mouseY
+
 
     /**
      * Attaches event handlers to the current canvas

@@ -105,6 +105,7 @@
         function runEditor(code: string) {
             sandbox.run(`(() => {
                 cancelAnimationFrame(skiJSData.raf);
+                background(255, 255, 255);
 
                 ${code}
 
