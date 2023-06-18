@@ -58,9 +58,6 @@
         
         const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
             signaling: [
-                // TODO: Replace with ws://signal-us-east-1d.xacer.dev:80
-                //       once DNS propagates and TLS comes in through
-                //       LetsEncrypt
                 "wss://signal-us-east-1d.xacer.dev:443"
             ]
         });
@@ -103,7 +100,7 @@
             frameClassName: "result-iframe" 
         }).promise;
 
-        await sandbox.importScript("ski.js")
+        await sandbox.importScript("code-together/ski.js")
 
         function runEditor(code: string) {
             sandbox.run(`(() => {
