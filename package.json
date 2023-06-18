@@ -1,5 +1,5 @@
 {
-	"name": "classroom3d",
+	"name": "code-together",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -31,6 +31,6 @@
 		"websandbox": "^0.5.3",
 		"y-codemirror.next": "^0.3.2",
 		"y-webrtc": "^10.2.5",
-		"yjs": "^13.6.2"
+		"yjs": "^13.6.4"
 	}
 }
