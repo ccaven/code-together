@@ -61,7 +61,7 @@
                 // TODO: Replace with ws://signal-us-east-1d.xacer.dev:80
                 //       once DNS propagates and TLS comes in through
                 //       LetsEncrypt
-                "ws://signal-us-east-1d.xacer.dev:443"
+                "wss://signal-us-east-1d.xacer.dev:443"
             ]
         });
         
