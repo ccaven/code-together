@@ -6,12 +6,10 @@
     import { EditorState } from "@codemirror/state";
     import { javascript } from '@codemirror/lang-javascript';
     import { onMount } from 'svelte';
-
-    import Sandbox, { type PluginInstance } from 'websandbox';
+    import { initSandbox } from './sandbox';
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
-    let sandbox: PluginInstance;
 
     export const usercolors = [
         { color: '#30bced', light: '#30bced33' },
@@ -95,52 +93,9 @@
             parent: editorContainer
         });
 
-        
-        async function initSandbox() {
-            sandbox = await Sandbox.create({}, { 
-                frameContainer: iFrameContainer, 
-                frameClassName: "result-iframe"
-            }).promise;
+        const { reload } = await initSandbox(iFrameContainer);
 
-            await sandbox.importScript("ski.js")
-        }
-
-        await initSandbox();
-
-        function runEditor(code: string) {
-            sandbox.run(`(() => {
-                cancelAnimationFrame(skiJSData.raf);
-                background(255, 255, 255);
-
-                ${code}
-
-                if (draw) {
-                    frameCount = 0;
-                    delta = 1000 / 60;
-                    then = performance.now();
-                    skiJSData.start = performance.now();
-
-                    function loop(time) {
-                        skiJSData.raf = requestAnimationFrame(loop);
-                        delta = time - then
-                        let ms = 1000 / skiJSData.rate
-                        if (delta < ms) return
-                        let overflow = delta % ms
-                        then = time - overflow
-                        delta -= overflow
-
-                        draw();
-
-                        frameCount += 1
-                        skiJSData.millis = performance.now() - skiJSData.start
-                        fps = 1000 / delta
-                    }
-                    skiJSData.raf = requestAnimationFrame(loop);
-                }
-            })()`);
-        }
-
-        let pollMs = 1000;
+        let pollMs = 1500;
         let lastText = "";
         let enabled = true;
 
@@ -149,7 +104,7 @@
                 let newText = view.state.doc.toString();
                 if (newText != lastText) {
                     console.log("Re-running editor");
-                    runEditor(newText);
+                    reload(newText);
                     lastText = newText;
                 }
             }
@@ -180,6 +135,7 @@
     :global(.result-iframe) {
         width: 600px;
         height: 600px;
+        overflow: hidden;
         border: 1px solid black;
     }
 </style>

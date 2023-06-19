@@ -1,10 +1,6 @@
-/*
-    ski.js
-    version 1.9.x
+import Sandbox from 'websandbox';
 
-    Edited by xacer for use in code-together
-*/
-
+const ski0 = /* javascript */`
 let CORNER, CENTER, CLOSE, SPACE, LEFT, RIGHT, UP, DOWN, SQUARE, ROUND, 
     PROJECT, MITER, BEVEL, DEGREES, RADIANS, PI, TAU, RGBA, HSL, HEX, 
     LEFT_BUTTON, RIGHT_BUTTON, ESCAPE, TAB, SHIFT, CONTROL, ALT, ENTER, 
@@ -28,7 +24,9 @@ let background, fill, stroke, image, clear, noStroke, noFill, rect,
     red, green, blue, alpha, frameRate, millis;
 
 let draw;
+`;
 
+const ski1 = /* javascript */`
 width = 600;
 height = 600;
 
@@ -153,17 +151,7 @@ RIGHT_BUTTON = 2;
     noFill = function () {
         ctx.fillStyle = color(0, 0)
     }
-    /**
-     * draws a rectangle on the canvas
-     * @param {number} x
-     * @param {number} y
-     * @param {number} width
-     * @param {number} height
-     * @param {...number} radius - radius or radii. basically works the same as [`ctx.roundRect`]{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/roundRect}
-     * @example
-     * rect(0, 0, 10, 10) 
-     * //draws a rectangle at (0, 0) with dimensions 10px by 10px
-    **/
+
     rect = function (x, y, width, height, ...radius) {
         [x, y] = skiJSData.pos("rect", x, y, width, height)
         if (radius.length > 0) {
@@ -191,7 +179,7 @@ RIGHT_BUTTON = 2;
         let i = 0, phrase = "", result = ""
         while(i < str.length){
             const frag = str[i]
-            const newLineCharIndex = frag.indexOf("\n")
+            const newLineCharIndex = frag.indexOf("\\\\" + "n")
             if(newLineCharIndex >= 0){
             phrase += frag.slice(0, newLineCharIndex + 1)
             result += phrase
@@ -200,14 +188,14 @@ RIGHT_BUTTON = 2;
             else {
                 phrase += frag + " "
                 if(textWidth(phrase) > width){
-                    result += phrase + "\n"
+                    result += phrase + "\\\\" + "n"
                     phrase = ""
                 }
             }
             i++
         }
         if(phrase.length > 0){
-            result += "\n" + phrase
+            result += "\\\\" + "n" + phrase
         }
         return result
     }
@@ -228,10 +216,10 @@ RIGHT_BUTTON = 2;
     text = function (msg, x, y, w, h) {
         msg = msg?.toString()
         if(w) msg = wrapText(msg, w)
-        if (msg.includes("\n")) {
-            msg.split("\n").map((p, i) => {
-                ctx.fillText(p, x, y + ((i - ((msg.split("\n")).length - 1) / 2) * (skiJSData.height + skiJSData.leading)))
-                ctx.strokeText(p, x, y + ((i - ((msg.split("\n")).length - 1) / 2) * (skiJSData.height + skiJSData.leading)))
+        if (msg.includes("\\\\" + "n")) {
+            msg.split("\\\\" + "n").map((p, i) => {
+                ctx.fillText(p, x, y + ((i - ((msg.split("\\\\" + "n")).length - 1) / 2) * (skiJSData.height + skiJSData.leading)))
+                ctx.strokeText(p, x, y + ((i - ((msg.split("\\\\" + "n")).length - 1) / 2) * (skiJSData.height + skiJSData.leading)))
             })
         } else {
             ctx.fillText(msg, x, y)
@@ -299,15 +287,11 @@ RIGHT_BUTTON = 2;
         ctx.textAlign = horizontal === CENTER ? "center" : "start"
         ctx.textBaseline = vertical === CENTER ? "middle" : "hanging"
     }
-    /**
-     * do NOT use this function! this is simply for PJS compatibility.
-     * it's useless, just returns whatever you input as an argument.
-     * @param {string} font
-     * @return {string} font
-    **/
-    createFont = function (font) {
-        return font
-    }
+}) ();
+`;
+
+const ski2 = /* javascript */`
+(function() {
     /**
      * sets the font size for any text drawn
      * @param {number} size
@@ -355,7 +339,7 @@ RIGHT_BUTTON = 2;
      * @param {string} txt - text
     **/
     textWidth = function (txt) {
-        return txt.split("\n").reduce((a, b) => max(a, ctx.measureText(b).width), 0)
+        return txt.split("\\\\" + "n").reduce((a, b) => max(a, ctx.measureText(b).width), 0)
     }
     /**
      * i honestly don't know. just ported the concept from PJS.
@@ -369,24 +353,15 @@ RIGHT_BUTTON = 2;
     textDescent = function () {
         ctx.measureText("a").fontBoundingBoxDescent
     }
-    /**
-     * sets the stroke cap. see [`ctx.lineCap`]{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineCap}
-     * @param {string} mode - line cap value; use ski.js constants
-    **/
+
     strokeCap = function (mode) {
         ctx.lineCap = mode
     }
-    /**
-     * sets the stroke cap. see [`ctx.lineJoin`]{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineJoin}
-     * @param {string} mode - line join value; use ski.js constants
-    **/
+
     strokeJoin = function (mode) {
         ctx.lineJoin = mode
     }
-    /**
-     * sets the stroke cap. see [`ctx.lineWidth`]{@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineWidth}
-     * @param {string} weight - line width value; use ski.js constants
-    **/
+
     strokeWeight = function (weight) {
         ctx.lineWidth = weight
     }
@@ -616,11 +591,7 @@ RIGHT_BUTTON = 2;
         vertex(x3, y3)
         endShape(CLOSE)
     }
-    /**
-     * draws a point with stroke
-     * @param {number} x
-     * @param {number} y
-    **/
+
     point = function (x, y) {
         if (ctx.strokeStyle !== color(0, 0)) {
             const cache = [ctx.strokeStyle, ctx.fillStyle]
@@ -631,13 +602,7 @@ RIGHT_BUTTON = 2;
             ctx.fillStyle = cache[1]
         }
     }
-    /**
-     * draws a line
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-    **/
+
     line = function (x1, y1, x2, y2) {
         ctx.beginPath()
         ctx.moveTo(x1, y1)
@@ -645,22 +610,7 @@ RIGHT_BUTTON = 2;
         ctx.closePath()
         ctx.stroke()
     }
-    /**
-     * returns the ImageData for the given canvas, coordinates an' dimensions
-     * @param {...(number|HTMLCanvasElement|OffscreenCanvas)} args - [x, y, width, height, sourceCanvas]
-     * @returns {(ImageData|string)} - the color or ImageData object
-     * @example
-     * get()
-     * //same as get(0, 0, width, height)
-     * get(0, 0)
-     * //returns the color of the pixel at (0, 0)
-     * get(canvas, 0, 0)
-     * //returns the color of the pixel at (0, 0) on canvas
-     * get(0, 0, 20, 20)
-     * //returns the ImageData object for (0, 0) with dimensions 20px by 20px
-     * get(canvas, 0, 0, 20, 20)
-     * //returns the ImageData object for (0, 0) with dimensions 20px by 20px on canvas
-    **/
+
     get = function (...args) {
         const [x, y, w, h, src] = args
         switch (args.length) {
@@ -693,18 +643,7 @@ RIGHT_BUTTON = 2;
             }
         }
     }
-    /**
-     * masks the previous graphics over the followin' graphics
-     * @example
-     * set(width, height)
-     * clear()
-     * //masking shape
-     * mask()
-     * //shapes to be masked
-     * const img = get(0, 0, width, height)
-     * set(document.getElementsByTagName("canvas")[0])
-     * image(img, 0, 0)
-    **/
+
     mask = function () {
         ctx.globalCompositeOperation = "source-atop"
     }
@@ -717,28 +656,28 @@ RIGHT_BUTTON = 2;
             pmouseY = mouseY;
             mouseX = event.data.mouseX;
             mouseY = event.data.mouseY;
-            mouseMoved();
+            if (typeof mouseMoved == "function") mouseMoved();
         }
         else if (event.data.type == "click") {
             mouseIsPressed = true;
-            mouseButton = e.button;
-            mousePressed();
+            mouseButton = event.data.button;
+            if (typeof mousePressed == "function") mousePressed();
         }
         else if (event.data.type == "keydown") {
             key = event.data.key;
             keyCode = event.data.keyCode;
             keyIsPressed = true;
-            keyPressed();
+            if (typeof keyPressed == "function") keyPressed();
         }
         else if (event.data.type == "keyup") {
-            key = e.key;
-            keyCode = e.keyCode;
-            keyReleased();
+            key = event.data.key;
+            keyCode = event.data.keyCode;
+            if (typeof keyReleased == "function") keyReleased();
         }
         else if (event.data.type == "mouseup") {
-            mouseButton = e.button;
+            mouseButton = event.data.button;
             mouseIsPressed = false;
-            mouseReleased();
+            if (typeof mouseReleased == "function") mouseReleased();
         }
     });
 
@@ -756,7 +695,7 @@ RIGHT_BUTTON = 2;
             let flags = ""
             if(this.flags.includes("bold")) flags += "bold "
             if(this.flags.includes("italics")) flags += "italics "
-            return (flags + `${size}px ` + font)
+            return (flags + (size+"px") + font)
         },
         pos(type, x, y, w, h) {
             return type === "rect" || type === "image" ? this[type] < 1 ? [x, y] : [x - w / 2, y - h / 2] : this[type] < 1 ? [x + w / 2, y + w / 2] : [x, y]
@@ -850,399 +789,173 @@ RIGHT_BUTTON = 2;
     cursor = function (name) {
         document.body.style.cursor = name
     }
-    /**
-     * enables image smoothing
-    **/
+
     smooth = function () {
         ctx.imageSmoothingEnabled = true
         ctx.imageSmoothingQuality = "high"
     }
-    /**
-     * disables image smoothing
-    **/
+
     noSmooth = function () {
         ctx.imageSmoothingEnabled = false
         ctx.imageSmoothingQuality = "low"
     }
-    /**
-     * disables the draw function
-    **/
-    noLoop = function () {
-        skiJSData.draw = draw
-        draw = 0
-    }
-    /**
-     * enables the draw function
-    **/
-    loop = function () {
-        draw = skiJSData.draw || draw
-    }
+})();
+`;
 
-    // math
-    /**
-     * returns the maximum value from two values
-     * does not find the maximum of all values for efficiency's sake
-     * if such a is = function necessary, this will do in a pinch:
-     * const maxAll = (...args) => args.reduce((a, b) => max(a, b), 0)
-     * @param {number} a
-     * @param {number} b
-     * @return {number} - the maximum
-    **/
+const ski3 = /* javascript */`
+(function () {
     max = function (a, b) {
         return a > b ? a : b
     }
-    /**
-     * returns the minimum value from two values
-     * does not find the minimum of all values for efficiency's sake
-     * if such a is = function necessary, this will do in a pinch:
-     * const minAll = (...args) => args.reduce((a, b) => min(a, b), 0)
-     * @param {number} a
-     * @param {number} b
-     * @return {number} - the minimum
-    **/
+
     min = function (a, b) {
         return a < b ? a : b
     }
-    /**
-     * returns the magnitude of two values
-     * @param {number} a
-     * @param {number} b
-     * @returns {number} - the magnitude
-    **/
+
     mag = function (a, b) {
         return Math.sqrt((a ** 2) + (b ** 2))
     }
-    /**
-     * returns the euclidean distance between two coordinates
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @returns {number} - the euclidean distance
-    **/
+
     dist = function (x1, y1, x2, y2) {
         return mag(x2 - x1, y2 - y1)
     }
-    /**
-     * returns the manhattan distance between two coordinates
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @returns {number} - the euclidean distance
-    **/
+
     manhattanDistance = function (x1, y1, x2, y2) {
         return abs(x1 - x2) + abs(y1 - y2)
     }
-    /**
-     * returns the chebyshev distance between two coordinates
-     * @param {number} x1
-     * @param {number} y1
-     * @param {number} x2
-     * @param {number} y2
-     * @returns {number} - the euclidean distance
-    **/
+
     chebyshevDistance = function (x1, y1, x2, y2) {
         return max(abs(x1 - x2), abs(y1 - y2))
     }
-    /**
-     * take the natural number to a number n
-     * @param {number} n - power to raise the natural number to
-     * @returns {number}
-    **/
+
     exp = function (n) {
         return Math.E ** n
     }
-    /**
-     * normalizes a value
-     * @param {number} val - value to normalize
-     * @param {number} low - lowest value
-     * @param {number} high - highest value
-     * @returns {number} - the normalized value
-    **/
+
     norm = function (val, low, high) {
         return (val - low) / (high - low)
     }
-    /**
-     * map a value to two ranges
-     * @param {number} val - value to normalize
-     * @param {number} a - lowest value of range 1
-     * @param {number} b - highest value of range 1
-     * @param {number} c - lowest value of range 2
-     * @param {number} d - highest value of range 2
-     * @returns {number} - the mapped value
-    **/
+
     map = function (val, a, b, c, d) {
         return c + (d - c) * norm(val, a, b)
     }
-    /**
-     * linearly interpolates a value
-     * @param {number} val - value to interpolate
-     * @param {number} targ - value to interpolate to
-     * @param {number} amt - amount to interpolate by
-     * @returns {number} - interpolated value
-    **/
+
     lerp = function (val, targ, amt) {
         return ((targ - val) * amt) + val
     }
-    /**
-     * returns a random value usin' Math.random
-     * @param {number} [min] - if max, minimum value generated; else, maximum value generated with the minimum value being 0
-     * @param {number} [max] - maximum value generated
-     * @returns {number} - random value
-    **/
+
     random = function (min, max) {
         if(max) return Math.random() * (max - min) + min
         else if(min) return Math.random() * min
         else return Math.random()
     }
-    /**
-     * constrain a value between two values
-     * @param {number} val - value to be constrained
-     * @param {number} low - lowest value that the value can be
-     * @param {number} high - highest value that the value can be
-     * @returns {number} - constrained value
-    **/
+
     constrain = function (val, low, high) {
         return min(max(val, low), high)
     }
-    /**
-     * returns the logarithm of a number
-     * alias for Math.log
-     * @param {number} n
-     * @returns {number}
-    **/
+
     log = function (n){
         return Math.log(n)
     }
-    /**
-     * returns the square root of a number
-     * alias for Math.sqrt
-     * @param {number} n
-     * @returns {number}
-    **/
+
     sqrt = function (n) {
         return Math.sqrt(n)
     }
-    /**
-     * returns the square of a number
-     * alias for n ** 2
-     * @param {number} n
-     * @returns {number}
-    **/
+
     sq = function (n) {
         return n ** 2
     }
-    /**
-     * returns the result of a base an' a power
-     * alias for a ** b
-     * @param {number} a - base
-     * @param {number} b - power
-     * @returns {number}
-    **/
+
     pow = function (a, b) {
         return a ** b
     }
-    /**
-     * returns the absolute value of a number
-     * @param {number} n
-     * @returns {number}
-    **/
+
     abs = function (n) {
         return n < 0 ? -n : n
     }
-    /**
-     * returns the truncated number
-     * @param {number} n
-     * @returns {number}
-    **/
+
     trunc = function (n) {
         return n | 0
     }
-    /**
-     * returns the floored number
-     * @param {number} n
-     * @returns {number}
-    **/
+
     floor = function (n) {
         return n < 0 ? (n | 0) - 1 : n | 0
     }
-    /**
-     * returns the ceilinged number
-     * @param {number} n
-     * @returns {number}
-    **/
+
     ceil = function (n) {
         return floor(n) + 1
     }
-    /**
-     * returns the rounded number
-     * @param {number} n
-     * @returns {number}
-    **/
+
     round = function (n) {
         return n - floor(n) < 0.5 ? floor(n) : ceil(n)
     }
-    /** TODO **/
-    /**
-     * returns the sine of an angle
-     * alias for Math.sin
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     sin = function (ang) {
         if(skiJSData.angle === DEGREES) ang = degrees(ang)
         return Math.sin(ang)
     }
-    /**
-     * returns the cosine of an angle
-     * alias for Math.cos
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     cos = function (ang) {
         if(skiJSData.angle === DEGREES) ang = degrees(ang)
         return Math.cos(ang)
     }
-    /**
-     * returns the tangent of an angle
-     * alias for Math.tan
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     tan = function (ang) {
         if(skiJSData.angle === DEGREES) ang = degrees(ang)
         return Math.tan(ang)
     }
-    /**
-     * returns the arccosine of an angle
-     * alias for Math.acos
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     acos = function (ang) {
         if(skiJSData.angle === DEGREES) ang = degrees(ang)
         return Math.acos(ang)
     }
-    /**
-     * returns the arcsine of an angle
-     * alias for Math.asin
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     asin = function (ang) {
         if(skiJSData.angle === DEGREES) ang = degrees(ang)
         return Math.asin(ang)
     }
-    /**
-     * returns the arctangent of an angle
-     * alias for Math.atan
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     atan = function (ang) {
         ang = Math.atan(ang)
         if(skiJSData.angle === DEGREES) ang = radians(ang)
         return ang
     }
-    /**
-     * alias for Math.atan2
-     * @param {number} y
-     * @param {number} x
-     * @returns {number}
-    **/
+
     atan2 = function (y, x) {
         let ang = Math.atan2(y, x)
         if(skiJSData.angle === DEGREES) ang = radians(ang)
         return ang
     }
-    /**
-     * returns the radian value of an angle in degrees
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     radians = function (ang) {
         return ang * (180 / PI)
     }
-    /**
-     * returns the degrees of an angle in radians
-     * @param {number} ang - angle
-     * @returns {number}
-    **/
+
     degrees = function (ang) {
         return ang * (PI / 180)
     }
-    /**
-     * sets the angle mode
-     * @param {string} mode - use DEGREES or RADIANS
-    **/
+
     angleMode = function (mode) {
         skiJSData.angle = mode
     }
-    /**
-     * evaluates the bezier at a point given t
-     * @param {number} a - control x 1
-     * @param {number} b - control y 1
-     * @param {number} c - control x 2
-     * @param {number} d - control y 2
-     * @param {number} t - value between 0 an' 1
-     * @returns {number}
-    **/
+
     bezierPoint = function (a, b, c, d, t) {
         return (1 - t) * (1 - t) * (1 - t) * a + 3 * (1 - t) * (1 - t) * t * b + 3 * (1 - t) * t * t * c + t * t * t * d
     }
-    /**
-     * evaluates the bezier at a tangent given t
-     * @param {number} a - control x 1
-     * @param {number} b - control y 1
-     * @param {number} c - control x 2
-     * @param {number} d - control y 2
-     * @param {number} t - value between 0 an' 1
-     * @returns {number}
-    **/
+
     bezierTangent = function (a, b, c, d, t) {
         return (3 * t * t * (-a + 3 * b - 3 * c + d) + 6 * t * (a - 2 * b + c) + 3 * (-a + b))
     }
-    /**
-     * sets the color mode
-     * @param {string} mode - use RGBA or HEX or HSL
-    **/
+
     colorMode = function (mode) {
         return skiJSData.color = mode
     }
-    /**
-     * returns the color given a variety of arguments.
-     * this is a monster that = function handles a lot of cases.
-     * @params {...*} args - see examples below
-     * @example
-     * color(25)
-     * color([25])
-     * //returns "rgba(25, 25, 25, 1)"
-     * color(25, 100)
-     * color([25, 100])
-     * //returns "rgba(25, 25, 25, 0.3921...)" where 0.3921... = 100 / 255
-     * color(175, 250, 175)
-     * color([175, 250, 175])
-     * //returns "rgba(175, 250, 175, 1)"
-     * color(175, 250, 175, 100)
-     * color([175, 250, 175, 100])
-     * //returns "rgba(175, 250, 175, 0.3921...)" where 0.3921... = 100 / 255
-     * colorMode(HSL)
-     * color(147, 50, 47)
-     * color([147, 50, 47])
-     * color("hsl(147, 50%, 47%)")
-     * //returns "hsl(147, 50%, 47%)"
-     * colorMode(HEX)
-     * color("#000")
-     * //returns "#000"
-     * color("rgba(25, 25, 25, 1)")
-     * //returns "rgba(25, 25, 25, 1)"
-    **/
+
     color = function (...args) {
         if (typeof args[0] === "string" && args.length <= 1 && (/(#|rgb|hsl|rgba)/).test(args[0])) return args[0]
         args[0] instanceof Array && (args = args[0])
         if (typeof args[1] === "number" && (/rgb|rgba/).test(args[0])) {
-            let cache = args[0].match(/[0-9\.]+(?=(,|\)))/g)
+            let cache = args[0].match(/[0-9\.]+(?=(,|\\)))/g)
             args = [cache[0], cache[1], cache[2], args[1]]
         }
         switch (skiJSData.color) {
@@ -1252,90 +965,63 @@ RIGHT_BUTTON = 2;
                 }) : args
                 switch (args.length) {
                     case 1:
-                        return `rgba(${r}, ${r}, ${r}, 1)`
+                        return "rgba(" + r + "," + r + "," + r + ", 1)";
                         break
                     case 2:
-                        return `rgba(${r}, ${r}, ${r}, ${g / 255})`
+                        return "rgba(" + r + "," + r + "," + r + "," + (g / 255) + ")";
                         break
                     case 3:
-                        return `rgba(${r}, ${g}, ${b}, 1)`
+                        return "rgba(" + r + "," + g + "," + b + ",1)";
                         break
                     case 4:
-                        return `rgba(${r}, ${g}, ${b}, ${a / 255})`
+                        return "rgba(" + r + "," + g + "," + b + "," + (a/255) + ")";
                 }
                 break
             case HSL:
-                return `hsl(${args[0]}, ${args[1]}%, ${args[2]}%)`
-                break
+                return "hsl(" + args[0] + "," + args[1] + "," + args[2] + ")";
             case HEX:
                 return args[0]
         }
     }
-    /**
-     * uses `lerp` to linerally interpolate two rgba color values
-     * @param {string} color1 - use `color`
-     * @param {string} color2 - use `color`
-     * @param {number} amt - amount to lerp
-     * @returns {string} - the lerped color
-    **/
+
     lerpColor = function (color1, color2, amt) {
         if (typeof color1 !== "string" || typeof color2 !== "string" || skiJSData.color !== RGBA)
             return
         const [r1, g1, b1, a1] = color1.match(/\d{1,3}/g)
         const [r2, g2, b2, a2] = color2.match(/\d{1,3}/g)
-        return `rgba(${lerp(+r1, +r2, amt)}, ${lerp(+g1, +g2, amt)}, ${lerp(+b1, +b2, amt)}, ${lerp(+a1, +a2, amt)})`
+        const [r, g, b, a] = [
+            lerp(+r1, +r2, amt),
+            lerp(+g1, +g2, amt),
+            lerp(+b1, +b2, amt),
+            lerp(+a1, +a2, amt)
+        ];
+        return "rgba("+r+","+g+","+b+","+a+")";
     }
-    /**
-     * returns the red value of the color
-     * @param {...(string|number|Array)} args
-     * @returns {number} - the red value
-     * @see {@link color} for the definition of the arguments
-    **/
+
     red = function (...args) {
         if(skiJSData.color !== RGBA) return
         const col = color(...args)
         return +col.match(/\d+(\.|)\d*/)
     }
-    /**
-     * returns the green value of the color
-     * @param {...(string|number|Array)} args
-     * @returns {number} - the green value
-     * @see {@link color} for the definition of the arguments
-    **/
+
     green = function (...args) {
         if(skiJSData.color !== RGBA) return
         const col = color(...args)
         return +col.match(/\d+(\.|)\d*/g)[1]
     }
-    /**
-     * returns the blue value of the color
-     * @param {...(string|number|Array)} args
-     * @returns {number} - the blue value
-     * @see {@link color} for the definition of the arguments
-    **/
+
     blue = function (...args) {
         if(skiJSData.color !== RGBA) return
         const col = color(...args)
         return +col.match(/\d+(\.|)\d*/g)[2]
     }
-    /**
-     * returns the alpha value of the color
-     * @param {...(string|number|Array)} args
-     * @returns {number} - the alpha value
-     * @see {@link color} for the definition of the arguments
-    **/
+
     alpha = function (...args) {
         if(skiJSData.color !== RGBA) return
         const col = color(...args)
         return trunc(col.match(/\d+(\.|)\d*/g)[3] * 255)
     }
-    /**
-     * returns a promise that resolves once an image has been fetched.
-     * @params {string} src - image source
-     * @params {number} [width] - width of the image
-     * @params {number} [height] - height of the image
-     * @returns {Promise}
-    **/
+
     getImage = function (src, width, height) {
         return new Promise((resolve, reject) => {
             let img = loadImage(src, width, height)
@@ -1344,13 +1030,7 @@ RIGHT_BUTTON = 2;
             img.onerror = () => reject("invalid or unaccessible image source")
         })
     }
-    /**
-     * returns an image
-     * @params {string} src - image source
-     * @params {number} [width] - width of the image
-     * @params {number} [height] - height of the image
-     * @returns {Image}
-    **/
+
     loadImage = function (src, width, height) {
         let img
         //dimensions
@@ -1361,52 +1041,169 @@ RIGHT_BUTTON = 2;
         if(!(/khanacademy/).test(src)) img.crossOrigin = "anonymous"
         return img
     }
-    /**
-     * returns a promise that resolves once all fonts has been fetched.
-     * @params {...string} fonts - all fonts
-     * @returns {Promise}
-     * @example
-     * getFont("Roboto", "Comfortaa")
-     * //fetches Roboto an' Comfortaa from Google Fonts
-    **/
-    getFont = function (...fonts) {
-        return new Promise ((res, rej) => {
-            // xxx HS16 - Efficiency :P
-            const link = loadFont(...fonts) 
-            link.onload = () => res(link)
-            link.onerror = () => reject("invalid or unaccessible fonts. not rlly, it's just an error lol. idk what went wrong, but you're router or DNS is blockin' fonts.googleapis.com")
-        })
-    }
-    /**
-     * returns an HTMLLinkElement that loads the fonts from Google Fonts
-     * @params {...string} fonts - all fonts
-     * @returns {HTMLLinkElement}
-     * @example
-     * loadFont("Roboto", "Comfortaa")
-     * //fetches Roboto an' Comfortaa from Google Fonts
-    **/
-    // loadFont = function (...fonts) {
-    //     const link = document.createElement("link")
-    //     link.rel = "stylesheet"
-    //     link.href = `https://fonts.googleapis.com/css?family=${fonts.join("|").replace(/ /g, "+")}`
-    //     document.body.appendChild(link)
-    //     return link
-    // }
 
-    // animation
-    /**
-     * sets the frame rate
-     * @params {number} rate - the frame rate in fps; note that 60 is the max due to JS restrictions
-    **/
     frameRate = function (rate) {
         skiJSData.rate = rate
     }
-    /**
-     * returns the milliseconds that have elapsed since the program started.
-     * @returns {number}
-    **/
+
     millis = function () {
         return skiJSData.millis
     }
-    
 }) ();
+`;
+
+const ski = `
+${ski0}
+${ski1}
+${ski2}
+${ski3}
+`;
+
+function makeWorkerScript(code: string) {
+    return /* javascript */`
+        self.addEventListener("message", function (event) {
+            if (event.data.type != "init") { return; }
+            const canvas = event.data.canvas;
+            const ctx = canvas.getContext("2d");
+
+            console.log(ctx);
+
+            ${ski}
+
+            background(255, 255, 255);
+
+            ${code}
+            
+            if (draw) {
+
+                frameCount = 0;
+                delta = 1000 / 60;
+                then = performance.now();
+                skiJSData.start = performance.now();
+                
+                function loop(time) {
+                    requestAnimationFrame(loop);
+
+                    delta = time - then
+                    let ms = 1000 / skiJSData.rate
+                    if (delta < ms) return
+                    let overflow = delta % ms
+                    then = time - overflow
+                    delta -= overflow
+
+                    draw();
+
+                    frameCount += 1
+                    skiJSData.millis = performance.now() - skiJSData.start
+                    fps = 1000 / delta
+                }
+
+                requestAnimationFrame(loop);
+            }
+        });
+    `;
+}
+
+function init() {
+
+
+    const sandboxScript = /* javascript */`
+
+    let cachedCanvas;
+    let cachedWorker;
+
+    function setupCanvas(canvas, worker) {
+        canvas.onmousemove = event => {
+            worker.postMessage({
+                type: "mousemove",
+                mouseX: event.x,
+                mouseY: event.y
+            });
+        };
+
+        canvas.onclick = event => {
+            worker.postMessage({
+                type: "click",
+                button: event.button
+            });
+        };
+
+        canvas.onkeydown = event => {
+            console.log(event);
+            worker.postMessage({
+                type: "keydown",
+                key: event.key,
+                keyCode: event.keyCode
+            });
+        };
+
+        canvas.onkeyup = event => {
+            worker.postMessage({
+                type: "keydown",
+                key: event.key,
+                keyCode: event.keyCode
+            });
+        };
+
+        canvas.onmouseup = event => {
+            worker.postMessage({
+                type: "mouseup",
+                button: event.button
+            });
+        };
+    }
+
+    async function generateWorker(code) {
+        if (cachedCanvas) document.body.removeChild(cachedCanvas);
+        if (cachedWorker) cachedWorker.terminate();
+
+        const workerScript = await Websandbox.connection.remote.makeWorkerScript(code);
+
+        const canvas = document.createElement("canvas");
+        canvas.style.width = "600px";
+        canvas.style.height = "600px";
+        canvas.width = 600;
+        canvas.height = 600;
+        canvas.style.top = "0px";
+        canvas.style.left = "0px";
+        canvas.style.position = "absolute";
+        document.body.appendChild(canvas);
+
+        const offscreenCanvas = canvas.transferControlToOffscreen();
+
+        // TODO: Add user code to worker script
+        const blob = new Blob([workerScript], { type: 'text/javascipt' });
+        const worker = new Worker(window.URL.createObjectURL(blob));
+
+        setupCanvas(canvas, worker);
+
+        worker.postMessage({ canvas: offscreenCanvas, type: "init" }, [offscreenCanvas]);
+
+        cachedWorker = worker;
+        cachedCanvas = canvas;
+    }
+    `;
+
+    return sandboxScript;
+}
+
+export async function initSandbox(frameContainer: HTMLDivElement) {
+    const sandbox = await Sandbox.create({
+        makeWorkerScript: async(c: string) => makeWorkerScript(c)
+    }, {
+        frameContainer,
+        frameClassName: "result-iframe"
+    }).promise;
+
+    await sandbox.run(init());
+
+    return {
+        reload(code: string) {
+            sandbox.run(`
+
+            generateWorker(${"`" + code + "`"});
+            `);
+        }
+    };
+}
+
