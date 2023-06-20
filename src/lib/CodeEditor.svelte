@@ -6,12 +6,10 @@
     import { EditorState } from "@codemirror/state";
     import { javascript } from '@codemirror/lang-javascript';
     import { onMount } from 'svelte';
-
-    import Sandbox, { type PluginInstance } from 'websandbox';
+    import { initSandbox } from './sandbox';
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
-    let sandbox: PluginInstance;
 
     export const usercolors = [
         { color: '#30bced', light: '#30bced33' },
@@ -61,8 +59,6 @@
                 "wss://signal-us-east-1d.xacer.dev:443"
             ]
         });
-        
-        console.log(provider.signalingConns);
 
         const ytext = ydoc.getText('codemirror');
 
@@ -95,65 +91,31 @@
             parent: editorContainer
         });
 
-        
-        async function initSandbox() {
-            sandbox = await Sandbox.create({}, { 
-                frameContainer: iFrameContainer, 
-                frameClassName: "result-iframe"
-            }).promise;
+        const { reload } = await initSandbox(iFrameContainer);
 
-            await sandbox.importScript("ski.js")
-        }
-
-        await initSandbox();
-
-        function runEditor(code: string) {
-            sandbox.run(`(() => {
-                cancelAnimationFrame(skiJSData.raf);
-                background(255, 255, 255);
-
-                ${code}
-
-                if (draw) {
-                    frameCount = 0;
-                    delta = 1000 / 60;
-                    then = performance.now();
-                    skiJSData.start = performance.now();
-
-                    function loop(time) {
-                        skiJSData.raf = requestAnimationFrame(loop);
-                        delta = time - then
-                        let ms = 1000 / skiJSData.rate
-                        if (delta < ms) return
-                        let overflow = delta % ms
-                        then = time - overflow
-                        delta -= overflow
-
-                        draw();
-
-                        frameCount += 1
-                        skiJSData.millis = performance.now() - skiJSData.start
-                        fps = 1000 / delta
-                    }
-                    skiJSData.raf = requestAnimationFrame(loop);
-                }
-            })()`);
-        }
-
-        let pollMs = 1000;
         let lastText = "";
-        let enabled = true;
+        let timeBeforeReload = 0.5;
+        let reloaded = false;
+        let lastEdit = performance.now();
 
-        setInterval(() => {
-            if (enabled) {
-                let newText = view.state.doc.toString();
-                if (newText != lastText) {
-                    console.log("Re-running editor");
-                    runEditor(newText);
-                    lastText = newText;
-                }
+        function pollLoop() {
+            requestAnimationFrame(pollLoop);
+            let newText = view.state.doc.toString();
+
+            if (newText != lastText) {
+                lastEdit = performance.now();
+                lastText = newText;
+                reloaded = false;
             }
-        }, pollMs);
+
+            if (!reloaded && performance.now() > lastEdit + timeBeforeReload * 1e3) {
+                console.log("Reloaded");
+                reload(newText);
+                reloaded = true;
+            }
+        }  
+
+        requestAnimationFrame(pollLoop);
 
     });
 
@@ -180,6 +142,7 @@
     :global(.result-iframe) {
         width: 600px;
         height: 600px;
+        overflow: hidden;
         border: 1px solid black;
     }
 </style>
