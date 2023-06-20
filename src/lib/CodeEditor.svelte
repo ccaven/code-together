@@ -59,8 +59,6 @@
                 "wss://signal-us-east-1d.xacer.dev:443"
             ]
         });
-        
-        console.log(provider.signalingConns);
 
         const ytext = ydoc.getText('codemirror');
 
@@ -95,20 +93,29 @@
 
         const { reload } = await initSandbox(iFrameContainer);
 
-        let pollMs = 1500;
         let lastText = "";
-        let enabled = true;
+        let timeBeforeReload = 0.5;
+        let reloaded = false;
+        let lastEdit = performance.now();
 
-        setInterval(() => {
-            if (enabled) {
-                let newText = view.state.doc.toString();
-                if (newText != lastText) {
-                    console.log("Re-running editor");
-                    reload(newText);
-                    lastText = newText;
-                }
+        function pollLoop() {
+            requestAnimationFrame(pollLoop);
+            let newText = view.state.doc.toString();
+
+            if (newText != lastText) {
+                lastEdit = performance.now();
+                lastText = newText;
+                reloaded = false;
             }
-        }, pollMs);
+
+            if (!reloaded && performance.now() > lastEdit + timeBeforeReload * 1e3) {
+                console.log("Reloaded");
+                reload(newText);
+                reloaded = true;
+            }
+        }  
+
+        requestAnimationFrame(pollLoop);
 
     });
 
