@@ -5,9 +5,9 @@ let CORNER, CENTER, CLOSE, SPACE, LEFT, RIGHT, UP, DOWN, SQUARE, ROUND,
     PROJECT, MITER, BEVEL, DEGREES, RADIANS, PI, TAU, RGBA, HSL, HEX, 
     LEFT_BUTTON, RIGHT_BUTTON, ESCAPE, TAB, SHIFT, CONTROL, ALT, ENTER, 
     BACKSPACE, fps, skiJSData, mousePressed, mouseReleased, 
-    mouseScrolled, mouseClicked, mouseOver, mouseOut, mouseMoved, mouseIsPressed, 
+    mouseScrolled, mouseClicked, mouseOver, mouseOut, mouseMoved, mouseIsPressed, mouseIsReleased, 
     mouseButton, mouseX, mouseY, pmouseX, pmouseY, keyPressed, keyReleased, 
-    keyTyped, key, keyIsPressed, keyCode, width, height;
+    key, keyIsPressed, keyIsReleased, keyCode, width, height;
 
 let background, fill, stroke, image, clear, noStroke, noFill, rect, 
     text, rectMode, ellipseMode, arcMode, imageMode, textAlign, createFont,
@@ -22,6 +22,8 @@ let background, fill, stroke, image, clear, noStroke, noFill, rect,
     ceil, round, sin, cos, tan, acos, asin, atan, atan2, radians, degrees,
     angleMode, bezierPoint, bezierTangent, colorMode, color, lerpColor,
     red, green, blue, alpha, frameRate, millis;
+
+let isKeyPressed;
 
 let draw;
 `;
@@ -652,32 +654,26 @@ const ski2 = /* javascript */`
         // TODO: sync with the rest 
 
         if (event.data.type == "mousemove") {
-            pmouseX = mouseX;
-            pmouseY = mouseY;
             mouseX = event.data.mouseX;
             mouseY = event.data.mouseY;
-            if (typeof mouseMoved == "function") mouseMoved();
         }
         else if (event.data.type == "click") {
             mouseIsPressed = true;
             mouseButton = event.data.button;
-            if (typeof mousePressed == "function") mousePressed();
         }
         else if (event.data.type == "keydown") {
             key = event.data.key;
             keyCode = event.data.keyCode;
-            keyIsPressed = true;
-            if (typeof keyPressed == "function") keyPressed();
+            skiJSData.keys.add(key);
         }
         else if (event.data.type == "keyup") {
             key = event.data.key;
             keyCode = event.data.keyCode;
-            if (typeof keyReleased == "function") keyReleased();
+            skiJSData.keys.delete(key);
         }
         else if (event.data.type == "mouseup") {
             mouseButton = event.data.button;
             mouseIsPressed = false;
-            if (typeof mouseReleased == "function") mouseReleased();
         }
     });
 
@@ -712,8 +708,11 @@ const ski2 = /* javascript */`
         draw: 0,
         angle: DEGREES,
         color: RGBA,
-        raf: -1
+        raf: -1,
+        keys: new Set()
     }
+
+    isKeyPressed = key => skiJSData.keys.has(key);
 
     // FPS
     fps = 60
@@ -1073,14 +1072,17 @@ function makeWorkerScript(code: string) {
             background(255, 255, 255);
 
             ${code}
-            
-            if (draw) {
 
-                frameCount = 0;
-                delta = 1000 / 60;
-                then = performance.now();
-                skiJSData.start = performance.now();
-                
+            frameCount = 0;
+            delta = 1000 / 60;
+            then = performance.now();
+            skiJSData.start = performance.now();
+            
+            {
+                function isFn(fn) {
+                    return !!fn && typeof fn == "function";
+                }
+
                 function loop(time) {
                     requestAnimationFrame(loop);
 
@@ -1091,7 +1093,21 @@ function makeWorkerScript(code: string) {
                     then = time - overflow
                     delta -= overflow
 
-                    draw();
+                    // TODO: Fix this so keyPressed and keyReleased work
+
+                    keyIsPressed = skiJSData.keys.size > 0;
+
+                    if ((pmouseX !== mouseX || pmouseY !== mouseY) && isFn(mouseMoved)) mouseMoved();
+                    if (mouseIsPressed && isFn(mousePressed)) mousePressed();
+                    if (mouseIsReleased && isFn(mouseReleased)) {
+                        mouseReleased();
+                        mouseIsReleased = false;
+                    }
+
+                    if (draw) draw();
+
+                    pmouseX = mouseX;
+                    pmouseY = mouseY;
 
                     frameCount += 1
                     skiJSData.millis = performance.now() - skiJSData.start
@@ -1100,6 +1116,7 @@ function makeWorkerScript(code: string) {
 
                 requestAnimationFrame(loop);
             }
+            
         });
     `;
 }
@@ -1121,36 +1138,37 @@ function init() {
             });
         };
 
-        canvas.onclick = event => {
+        window.addEventListener("mousedown", event => {
             worker.postMessage({
                 type: "click",
                 button: event.button
             });
-        };
+        });
 
-        canvas.onkeydown = event => {
+        window.addEventListener("keydown", event => {
             console.log(event);
             worker.postMessage({
                 type: "keydown",
                 key: event.key,
                 keyCode: event.keyCode
             });
-        };
+        });
 
-        canvas.onkeyup = event => {
+        window.addEventListener("keyup", event => {
+            console.log(event);
             worker.postMessage({
-                type: "keydown",
+                type: "keyup",
                 key: event.key,
                 keyCode: event.keyCode
             });
-        };
+        });
 
-        canvas.onmouseup = event => {
+        window.addEventListener("mouseup", event => {
             worker.postMessage({
                 type: "mouseup",
                 button: event.button
             });
-        };
+        });
     }
 
     async function generateWorker(code) {
