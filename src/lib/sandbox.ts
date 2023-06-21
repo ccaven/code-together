@@ -24,6 +24,8 @@ let background, fill, stroke, image, clear, noStroke, noFill, rect,
     red, green, blue, alpha, frameRate, millis;
 
 let draw;
+
+let _runMouseMoved, _runMouseReleased, _runMousePressed, _runKeyPressed, _runKeyReleased;
 `;
 
 const ski1 = /* javascript */`
@@ -652,32 +654,30 @@ const ski2 = /* javascript */`
         // TODO: sync with the rest 
 
         if (event.data.type == "mousemove") {
-            pmouseX = mouseX;
-            pmouseY = mouseY;
             mouseX = event.data.mouseX;
             mouseY = event.data.mouseY;
-            if (typeof mouseMoved == "function") mouseMoved();
+            if (typeof mouseMoved == "function") _runMouseMoved = true;
         }
         else if (event.data.type == "click") {
             mouseIsPressed = true;
             mouseButton = event.data.button;
-            if (typeof mousePressed == "function") mousePressed();
+            if (typeof mousePressed == "function") _runMousePressed = true;
         }
         else if (event.data.type == "keydown") {
             key = event.data.key;
             keyCode = event.data.keyCode;
             keyIsPressed = true;
-            if (typeof keyPressed == "function") keyPressed();
+            if (typeof keyPressed == "function") _runKeyPressed = true;
         }
         else if (event.data.type == "keyup") {
             key = event.data.key;
             keyCode = event.data.keyCode;
-            if (typeof keyReleased == "function") keyReleased();
+            if (typeof keyReleased == "function") _runKeyReleased = true;
         }
         else if (event.data.type == "mouseup") {
             mouseButton = event.data.button;
             mouseIsPressed = false;
-            if (typeof mouseReleased == "function") mouseReleased();
+            if (typeof mouseReleased == "function") _runMouseReleased = true;
         }
     });
 
@@ -1073,14 +1073,13 @@ function makeWorkerScript(code: string) {
             background(255, 255, 255);
 
             ${code}
-            
-            if (draw) {
 
-                frameCount = 0;
-                delta = 1000 / 60;
-                then = performance.now();
-                skiJSData.start = performance.now();
-                
+            frameCount = 0;
+            delta = 1000 / 60;
+            then = performance.now();
+            skiJSData.start = performance.now();
+            
+            {
                 function loop(time) {
                     requestAnimationFrame(loop);
 
@@ -1091,7 +1090,23 @@ function makeWorkerScript(code: string) {
                     then = time - overflow
                     delta -= overflow
 
-                    draw();
+                    // TODO: Fix this so keyPressed and keyReleased work
+
+                    if (_runMouseMoved && mouseMoved && typeof mouseMoved == "function") mouseMoved();
+                    if (mouseIsPressed && mousePressed && typeof mousePressed == "function") mousePressed();
+                    if (_runMouseReleased && mouseReleased && typeof mouseReleased == "function") mouseReleased();
+                    if (keyIsPressed && keyPressed && typeof keyPressed == "function") keyPressed();
+                    if (_runKeyReleased && keyReleased && typeof keyReleased == "function") keyReleased();
+
+                    _runMouseMoved = false;
+                    _runMouseReleased = false;
+                    _runKeyPressed = false;
+                    _runKeyReleased = false;
+
+                    if (draw) draw();
+
+                    pmouseX = mouseX;
+                    pmouseY = mouseY;
 
                     frameCount += 1
                     skiJSData.millis = performance.now() - skiJSData.start
@@ -1100,6 +1115,7 @@ function makeWorkerScript(code: string) {
 
                 requestAnimationFrame(loop);
             }
+            
         });
     `;
 }
@@ -1146,6 +1162,7 @@ function init() {
         };
 
         canvas.onmouseup = event => {
+            console.log("mouseup");
             worker.postMessage({
                 type: "mouseup",
                 button: event.button
