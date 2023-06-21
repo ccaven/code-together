@@ -5,9 +5,9 @@ let CORNER, CENTER, CLOSE, SPACE, LEFT, RIGHT, UP, DOWN, SQUARE, ROUND,
     PROJECT, MITER, BEVEL, DEGREES, RADIANS, PI, TAU, RGBA, HSL, HEX, 
     LEFT_BUTTON, RIGHT_BUTTON, ESCAPE, TAB, SHIFT, CONTROL, ALT, ENTER, 
     BACKSPACE, fps, skiJSData, mousePressed, mouseReleased, 
-    mouseScrolled, mouseClicked, mouseOver, mouseOut, mouseMoved, mouseIsPressed, 
+    mouseScrolled, mouseClicked, mouseOver, mouseOut, mouseMoved, mouseIsPressed, mouseIsReleased, 
     mouseButton, mouseX, mouseY, pmouseX, pmouseY, keyPressed, keyReleased, 
-    keyTyped, key, keyIsPressed, keyCode, width, height;
+    key, keyIsPressed, keyIsReleased, keyCode, width, height;
 
 let background, fill, stroke, image, clear, noStroke, noFill, rect, 
     text, rectMode, ellipseMode, arcMode, imageMode, textAlign, createFont,
@@ -23,9 +23,9 @@ let background, fill, stroke, image, clear, noStroke, noFill, rect,
     angleMode, bezierPoint, bezierTangent, colorMode, color, lerpColor,
     red, green, blue, alpha, frameRate, millis;
 
-let draw;
+let isKeyPressed;
 
-let _runMouseMoved, _runMouseReleased, _runMousePressed, _runKeyPressed, _runKeyReleased;
+let draw;
 `;
 
 const ski1 = /* javascript */`
@@ -656,28 +656,24 @@ const ski2 = /* javascript */`
         if (event.data.type == "mousemove") {
             mouseX = event.data.mouseX;
             mouseY = event.data.mouseY;
-            if (typeof mouseMoved == "function") _runMouseMoved = true;
         }
         else if (event.data.type == "click") {
             mouseIsPressed = true;
             mouseButton = event.data.button;
-            if (typeof mousePressed == "function") _runMousePressed = true;
         }
         else if (event.data.type == "keydown") {
             key = event.data.key;
             keyCode = event.data.keyCode;
-            keyIsPressed = true;
-            if (typeof keyPressed == "function") _runKeyPressed = true;
+            skiJSData.keys.add(key);
         }
         else if (event.data.type == "keyup") {
             key = event.data.key;
             keyCode = event.data.keyCode;
-            if (typeof keyReleased == "function") _runKeyReleased = true;
+            skiJSData.keys.delete(key);
         }
         else if (event.data.type == "mouseup") {
             mouseButton = event.data.button;
             mouseIsPressed = false;
-            if (typeof mouseReleased == "function") _runMouseReleased = true;
         }
     });
 
@@ -712,8 +708,11 @@ const ski2 = /* javascript */`
         draw: 0,
         angle: DEGREES,
         color: RGBA,
-        raf: -1
+        raf: -1,
+        keys: new Set()
     }
+
+    isKeyPressed = key => skiJSData.keys.has(key);
 
     // FPS
     fps = 60
@@ -1080,6 +1079,10 @@ function makeWorkerScript(code: string) {
             skiJSData.start = performance.now();
             
             {
+                function isFn(fn) {
+                    return !!fn && typeof fn == "function";
+                }
+
                 function loop(time) {
                     requestAnimationFrame(loop);
 
@@ -1092,16 +1095,14 @@ function makeWorkerScript(code: string) {
 
                     // TODO: Fix this so keyPressed and keyReleased work
 
-                    if (_runMouseMoved && mouseMoved && typeof mouseMoved == "function") mouseMoved();
-                    if (mouseIsPressed && mousePressed && typeof mousePressed == "function") mousePressed();
-                    if (_runMouseReleased && mouseReleased && typeof mouseReleased == "function") mouseReleased();
-                    if (keyIsPressed && keyPressed && typeof keyPressed == "function") keyPressed();
-                    if (_runKeyReleased && keyReleased && typeof keyReleased == "function") keyReleased();
+                    keyIsPressed = skiJSData.keys.size > 0;
 
-                    _runMouseMoved = false;
-                    _runMouseReleased = false;
-                    _runKeyPressed = false;
-                    _runKeyReleased = false;
+                    if ((pmouseX !== mouseX || pmouseY !== mouseY) && isFn(mouseMoved)) mouseMoved();
+                    if (mouseIsPressed && isFn(mousePressed)) mousePressed();
+                    if (mouseIsReleased && isFn(mouseReleased)) {
+                        mouseReleased();
+                        mouseIsReleased = false;
+                    }
 
                     if (draw) draw();
 
@@ -1137,37 +1138,37 @@ function init() {
             });
         };
 
-        canvas.onclick = event => {
+        window.addEventListener("mousedown", event => {
             worker.postMessage({
                 type: "click",
                 button: event.button
             });
-        };
+        });
 
-        canvas.onkeydown = event => {
+        window.addEventListener("keydown", event => {
             console.log(event);
             worker.postMessage({
                 type: "keydown",
                 key: event.key,
                 keyCode: event.keyCode
             });
-        };
+        });
 
-        canvas.onkeyup = event => {
+        window.addEventListener("keyup", event => {
+            console.log(event);
             worker.postMessage({
-                type: "keydown",
+                type: "keyup",
                 key: event.key,
                 keyCode: event.keyCode
             });
-        };
+        });
 
-        canvas.onmouseup = event => {
-            console.log("mouseup");
+        window.addEventListener("mouseup", event => {
             worker.postMessage({
                 type: "mouseup",
                 button: event.button
             });
-        };
+        });
     }
 
     async function generateWorker(code) {
