@@ -18,22 +18,32 @@
     
     <h2>Load Example</h2>
     
-    <ul>
-        {#each examples as example}
-            <li>
-                <!-- svelte-ignore a11y-invalid-attribute -->
-                <a href="javascript:void(0)" on:click={()=>onclick(example)}>{example.title}</a>
-            </li>
-        {/each}
-    </ul>
+
+    {#each examples as example}
+        <div>
+            <!-- svelte-ignore a11y-invalid-attribute -->
+            <a href="javascript:void(0)" on:click={()=>onclick(example)}>{example.title}</a>
+        </div>
+    {/each}
+
 
 </main>
 
 <style>
     main {
-        border: 1px solid red;
         width: 100%;
         height: 100%;
+    }
+
+    div {
+        border: 1px solid black;
+        padding: 5px;
+        margin: 5px;
+        display: inline;
+        text-decoration: none;
+    }
+    a {
+        text-decoration: none;
     }
 
 </style>

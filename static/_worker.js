@@ -1266,7 +1266,10 @@ self.addEventListener("message", (event) => {
     }
 
     background(255, 255, 255);
-
+    fill(255, 255, 255);
+    stroke(0, 0, 0);
+    strokeWeight(1);
+    
     console.log(event.data.code);
 
     ((fn, args) => { 

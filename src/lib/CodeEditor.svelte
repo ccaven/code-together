@@ -11,7 +11,6 @@
     import { initSandbox } from './sandbox';
     import Examples from './Examples.svelte';
     import { keymap } from '@codemirror/view';
-
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
 
@@ -92,8 +91,7 @@
                 javascript(),
                 yCollab(ytext, provider.awareness, { undoManager }),
                 keymap.of([indentWithTab]),
-                indentUnit.of("    "),
-                //EditorState.tabSize.of(10),
+                indentUnit.of("    "), // 4-spaces
                 myTheme
             ],
         });
@@ -184,7 +182,7 @@
         grid-row: 1;
     }
 
-    #editor { grid-column: 1; } 
+    #editor { grid-column: 1; overflow: auto; } 
     #result { grid-column: 2; } 
 
     #examples { grid-column: 1 / 3; grid-row: 2; }
