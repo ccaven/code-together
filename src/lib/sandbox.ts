@@ -538,7 +538,8 @@ const ski2 = /* javascript */`
             else scale(1, max(w, h) / min(w, h))
         }
         ctx.beginPath()
-        if(ctx.fillStyle !== color(0, 0)) ctx.moveTo(0, 0)
+        console.log(ctx.fillStyle, color(0,0));
+        if(ctx.fillStyle != color(0, 0)) ctx.moveTo(0, 0)
         ctx.arc(0, 0, min(w, h) / 2, degrees(start), degrees(stop))
         if(close) ctx.closePath()
         popMatrix()
@@ -964,20 +965,20 @@ const ski3 = /* javascript */`
                 }) : args
                 switch (args.length) {
                     case 1:
-                        return "rgba(" + r + "," + r + "," + r + ", 1)";
+                        return "rgba(" + r + ", " + r + ", " + r + ", 1)";
                         break
                     case 2:
-                        return "rgba(" + r + "," + r + "," + r + "," + (g / 255) + ")";
+                        return "rgba(" + r + ", " + r + ", " + r + ", " + (g / 255) + ")";
                         break
                     case 3:
-                        return "rgba(" + r + "," + g + "," + b + ",1)";
+                        return "rgba(" + r + ", " + g + ", " + b + ", 1)";
                         break
                     case 4:
                         return "rgba(" + r + "," + g + "," + b + "," + (a/255) + ")";
                 }
                 break
             case HSL:
-                return "hsl(" + args[0] + "," + args[1] + "," + args[2] + ")";
+                return "hsl(" + args[0] + ", " + args[1] + ", " + args[2] + ")";
             case HEX:
                 return args[0]
         }
@@ -994,7 +995,7 @@ const ski3 = /* javascript */`
             lerp(+b1, +b2, amt),
             lerp(+a1, +a2, amt)
         ];
-        return "rgba("+r+","+g+","+b+","+a+")";
+        return "rgba("+r+", "+g+", "+b+", "+a+")";
     }
 
     red = function (...args) {
