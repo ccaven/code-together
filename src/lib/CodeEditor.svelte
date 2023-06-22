@@ -169,7 +169,7 @@
         margin: auto;
         margin-top: 2rem;
         display: grid;
-        grid-template-columns: 1fr auto;
+        grid-template-columns: 1fr 1fr;
         grid-template-rows: 600px auto;
         border: 1px solid lightgray;
     }
@@ -178,7 +178,12 @@
         grid-row: 1;
     }
 
-    #editor { grid-column: 1; } 
+    #editor { 
+        grid-column: 1; 
+        overflow: auto; 
+        border: 1px solid lightgray;
+    } 
+    
     #result { grid-column: 2; } 
 
     #examples { grid-column: 1 / 3; grid-row: 2; }

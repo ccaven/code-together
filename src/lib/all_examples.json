@@ -14,5 +14,9 @@
     {
         "title": "User Input: mouseMoved",
         "code": "// Mouse events\n// mouseMoved is a builtin function that runs whenever you move the mouse\n\nmouseMoved = function() {\n  // mouseX is the x-position of the mouse on the canvas\n  // mouseY is the y-position of the mouse on the canvas\n  // pmouseX is the mouseX of the previous frame\n  // pmouseY is the mouseY of the previous frame\n\n  // mouseIsPressed is true if you are holding the\n  // mouse button down and false if you aren't\n\n  // Let's draw a line connecting the mouse's \n  // previous position with it's current position\n\n  if (mouseIsPressed) { // only run this code if we've clicked\n    \n    line(pmouseX, pmouseY, mouseX, mouseY);\n  \n  }\n  \n};"
+    },
+    {
+        "title": "User input: isKeyPressed",
+        "code": "let x = 300;\nlet y = 300;\n\ndraw = function () {\n\n  if (isKeyPressed(\"w\")) {\n    y -= 5;\n  }\n\n  if (isKeyPressed(\"s\")) {\n    y += 5;\n  }\n\n  if (isKeyPressed(\"a\")) {\n    x -= 5;\n  }\n\n  if (isKeyPressed(\"d\")) {\n    x += 5;\n  }\n\n  background(255);\n  rect(x, y, 50, 50);\n  \n};"
     }
 ]
