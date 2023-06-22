@@ -21,6 +21,7 @@
     <ul>
         {#each examples as example}
             <li>
+                <!-- svelte-ignore a11y-invalid-attribute -->
                 <a href="javascript:void(0)" on:click={()=>onclick(example)}>{example.title}</a>
             </li>
         {/each}
