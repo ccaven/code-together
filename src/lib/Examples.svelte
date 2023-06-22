@@ -36,4 +36,14 @@
         height: 100%;
     }
 
+    ul {
+        display: flexbox;
+    }
+
+    li {
+        border: 1px solid black;
+        padding: 5px;
+        display: inline;
+    }
+
 </style>

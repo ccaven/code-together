@@ -995,7 +995,7 @@ const ski3 = /* javascript */`
             lerp(+b1, +b2, amt),
             lerp(+a1, +a2, amt)
         ];
-        return "rgba("+r+", "+g+", "+b+", "+a+")";
+        return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
     }
 
     red = function (...args) {
