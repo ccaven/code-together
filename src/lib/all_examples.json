@@ -1,0 +1,10 @@
+[
+    {
+        "title": "Basic Shapes",
+        "code": "// Let's draw a rectangle\n\nrect(100, 150, 200, 150);\n//   ^    ^     ^     ^\n//   x    y   width  height\n\n// Now let's add some color\nfill(255, 100, 50);\n//   ^     ^    ^\n//   red  green blue\n\n// These rectangles now appear as orange\nrect(50, 50, 50, 50);\nrect(150, 50, 50, 50);\nrect(250, 50, 50, 50);\nrect(350, 50, 50, 50);\nrect(450, 50, 50, 50); // increasing the x-coordinate\n                       // means going more to the right!\n\n\n// What other shapes can we draw?\nfill(50, 150, 255);\n\n// \"ellipse\" is basically a circle, but can have different width/height\nellipse(300, 500, 50, 50);\n//     (x, y, width, height) just like rect\n\n// This is a squished one\n//                 \\/ see the increased \"width\" parameter\nellipse(300, 565, 150, 50);"
+    },
+    {
+        "title": "Variables",
+        "code": "// Let's make some variables!\n\n// These are red\nfill(250, 50, 100);\nrect(100, 100, 50, 25);\nrect(100, 150, 50, 25);\nrect(100, 200, 50, 25);\nrect(100, 250, 50, 25);\nrect(100, 300, 50, 25);\n//    ^ hmm notice a lot of repeated numbers?\n\n// \\/ now we've made a variable called \"x\"\nvar x = 200;\n\n// Anytime we use \"x\" now, it means 200\n\n// These are green\nfill(50, 250, 100);\nrect(x, 100, 50, 25);\nrect(x, 150, 50, 25);\nrect(x, 200, 50, 25);\nrect(x, 250, 50, 25);\nrect(x, 300, 50, 25);\n//   ^ all of these have an x-coordinate of 200\n\n// We can also reassign variables\nx = 300;\n\n// From this point on, x will be 300\n// Let's run the exact same commands as before\n// and let's make them blue\nfill(50, 100, 250);\nrect(x, 100, 50, 25);\nrect(x, 150, 50, 25);\nrect(x, 200, 50, 25);\nrect(x, 250, 50, 25);\nrect(x, 300, 50, 25);\n// See, the same command as before produced a different result\n// because the value of \"x\" was changed!"
+    }
+]

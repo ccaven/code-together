@@ -3,10 +3,11 @@
     import { yCollab } from 'y-codemirror.next';
     import { WebrtcProvider } from 'y-webrtc';
     import { EditorView, basicSetup } from 'codemirror';
-    import { EditorState } from "@codemirror/state";
+    import { EditorState, Text, Transaction } from "@codemirror/state";
     import { javascript } from '@codemirror/lang-javascript';
-    import { onMount } from 'svelte';
+    import { onMount, setContext } from 'svelte';
     import { initSandbox } from './sandbox';
+    import Examples from './Examples.svelte';
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
@@ -42,6 +43,10 @@
         return result;
     }
 
+    let reload: (code: string) => void;
+    let state: EditorState;
+    let view: EditorView;
+
     onMount(async () => {
 
         const urlSearchParams = new URLSearchParams(location.search);
@@ -73,10 +78,11 @@
         let myTheme = EditorView.theme({
             "&": {
                 width: "100%",
+                height: "600px"
             },
         })
 
-        const state = EditorState.create({
+        state = EditorState.create({
             doc: ytext.toString(),
             extensions: [
                 basicSetup,
@@ -86,12 +92,12 @@
             ]
         })
 
-        const view = new EditorView({ 
+        view = new EditorView({ 
             state, 
             parent: editorContainer
         });
 
-        const { reload } = await initSandbox(iFrameContainer);
+        reload = (await initSandbox(iFrameContainer)).reload;
 
         let lastText = "";
         let timeBeforeReload = 0.5;
@@ -109,7 +115,6 @@
             }
 
             if (!reloaded && performance.now() > lastEdit + timeBeforeReload * 1e3) {
-                console.log("Reloaded");
                 reload(newText);
                 reloaded = true;
             }
@@ -119,11 +124,43 @@
 
     });
 
+
+    setContext("example-setter", (code: string) => {
+        if (reload && view) {
+            // Replace editor content
+            view.dispatch({
+                changes: [
+                    {
+                        from: 0, 
+                        to: view.state.doc.length, 
+                        insert: Text.of(code.split("\n")),
+                        
+                    }
+                ],
+            });
+
+            reload(code);
+        }
+    });
+
+    // Helper function for adding examples faster
+    // @ts-ignore
+    window["exportCode"] = function (title: string) {
+        if (view) {
+            const code = view.state.doc.toString();
+            title = title.toString();
+            console.log({ title, code });
+        }
+    };
+
 </script>
 
 <div id="total-container">
     <div bind:this={editorContainer} id="editor"></div>
     <div bind:this={iFrameContainer} id="result"></div>
+    <div id="examples">
+        <Examples/>
+    </div>
 </div>
 
 <style>
@@ -131,18 +168,27 @@
         max-width: 1200px;
         margin: auto;
         margin-top: 2rem;
-    }
-
-    div {
         display: grid;
         grid-template-columns: 1fr auto;
+        grid-template-rows: 600px auto;
         border: 1px solid lightgray;
     }
+
+    #editor, #result {
+        grid-row: 1;
+    }
+
+    #editor { grid-column: 1; } 
+    #result { grid-column: 2; } 
+
+    #examples { grid-column: 1 / 3; grid-row: 2; }
 
     :global(.result-iframe) {
         width: 600px;
         height: 600px;
         overflow: hidden;
         border: 1px solid black;
+        padding: 0;
+        margin: 0;
     }
 </style>
