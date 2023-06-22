@@ -5,9 +5,12 @@
     import { EditorView, basicSetup } from 'codemirror';
     import { EditorState, Text, Transaction } from "@codemirror/state";
     import { javascript } from '@codemirror/lang-javascript';
+    import { indentWithTab } from '@codemirror/commands'
+    import { indentUnit } from '@codemirror/language'
     import { onMount, setContext } from 'svelte';
     import { initSandbox } from './sandbox';
     import Examples from './Examples.svelte';
+    import { keymap } from '@codemirror/view';
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
@@ -88,9 +91,12 @@
                 basicSetup,
                 javascript(),
                 yCollab(ytext, provider.awareness, { undoManager }),
+                keymap.of([indentWithTab]),
+                indentUnit.of("    "),
+                //EditorState.tabSize.of(10),
                 myTheme
-            ]
-        })
+            ],
+        });
 
         view = new EditorView({ 
             state, 
