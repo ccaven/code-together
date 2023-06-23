@@ -14,5 +14,9 @@
     {
         "title": "User Input: mouseMoved",
         "code": "// Mouse events\n// mouseMoved is a builtin function that runs whenever you move the mouse\n\nmouseMoved = function() {\n  // mouseX is the x-position of the mouse on the canvas\n  // mouseY is the y-position of the mouse on the canvas\n  // pmouseX is the mouseX of the previous frame\n  // pmouseY is the mouseY of the previous frame\n\n  // mouseIsPressed is true if you are holding the\n  // mouse button down and false if you aren't\n\n  // Let's draw a line connecting the mouse's \n  // previous position with it's current position\n\n  if (mouseIsPressed) { // only run this code if we've clicked\n    \n    line(pmouseX, pmouseY, mouseX, mouseY);\n  \n  }\n  \n};"
+    },
+    {
+        "title": "Text: Bounding Box",
+        "code": "let msg = \"Some text.\\n\\nMore text.\";\nlet size = 100;\nlet x = 300, y = 300;\n\ntextFont(\"sans-serif\");\ntextSize(size);\ntextAlign(CENTER, CENTER);\nrectMode(CENTER);\n\nfunction textHeight(msg) {\n    return size * msg.split(\"\\n\").length;\n}\n\nlet w = textWidth(msg);\nlet h = textHeight(msg);\nrect(x, y, w, h);\n\ntext(msg, x, y);\n\n"
     }
 ]

@@ -496,13 +496,13 @@ self.addEventListener("message", (event) => {
              * i honestly don't know. just ported the concept from PJS.
              **/
             textAscent = function () {
-                return ctx.measureText("a").fontBoundingBoxAscent;
+                return ctx.measureText("l").fontBoundingBoxAscent;
             };
             /**
              * i honestly don't know. just ported the concept from PJS.
              **/
             textDescent = function () {
-                ctx.measureText("a").fontBoundingBoxDescent;
+                ctx.measureText("g").fontBoundingBoxDescent;
             };
 
             strokeCap = function (mode) {
@@ -847,7 +847,7 @@ self.addEventListener("message", (event) => {
                     let flags = "";
                     if (this.flags.includes("bold")) flags += "bold ";
                     if (this.flags.includes("italics")) flags += "italics ";
-                    return flags + (size + "px") + font;
+                    return flags + (size + "px ") + font;
                 },
                 pos(type, x, y, w, h) {
                     return type === "rect" || type === "image"
