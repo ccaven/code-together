@@ -18,5 +18,9 @@
     {
         "title": "Text: Bounding Box",
         "code": "let msg = \"Some text.\\n\\nMore text.\";\nlet size = 100;\nlet x = 300, y = 300;\n\ntextFont(\"sans-serif\");\ntextSize(size);\ntextAlign(CENTER, CENTER);\nrectMode(CENTER);\n\nfunction textHeight(msg) {\n    return size * msg.split(\"\\n\").length;\n}\n\nlet w = textWidth(msg);\nlet h = textHeight(msg);\nrect(x, y, w, h);\n\ntext(msg, x, y);\n\n"
+    },
+    {
+        "title": "Clock",
+        "code": "// Let's make a clock!\n\ntextAlign(CENTER, CENTER);\ntextFont(\"Trebuchet MS\");\ntextSize(50);\nfill(0);\nnoStroke();\n\ndraw = function () {\n    background(255);\n\n    // Let's get our hour/minute/seconds\n    let h = hour();\n    let m = minute();\n    let s = seconds();\n\n    // Are we in the AM or PM?\n    let label = h > 12 ? \"pm\" : \"am\";\n\n    // Prepare each number for outputting\n    h = (h % 12).toString();\n    m = m.toString().padStart(2, \"0\");\n    s = s.toString().padStart(2, \"0\")\n    \n    text(`${h}:${m}:${s} ${label}`, 300, 300);\n};\n"
     }
 ]

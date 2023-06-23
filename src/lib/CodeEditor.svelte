@@ -185,13 +185,17 @@
     #editor { grid-column: 1; overflow: auto; } 
     #result { grid-column: 2; } 
 
-    #examples { grid-column: 1 / 3; grid-row: 2; }
+    #examples { 
+        grid-column: 1 / 3; 
+        grid-row: 2; 
+        padding: 15px;
+        border: 1px solid black;
+    }
 
     :global(.result-iframe) {
         width: 600px;
         height: 600px;
         overflow: hidden;
-        border: 1px solid black;
         padding: 0;
         margin: 0;
     }
