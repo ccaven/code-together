@@ -55,9 +55,9 @@
 
         // TODO: Make sure room id's don't overlap
         // i.e. seed with millisecond
-        let roomId = urlSearchParams.has("join-id") ? urlSearchParams.get("join-id") : makeId(6);
+        let roomId = urlSearchParams.has("id") ? urlSearchParams.get("id") : makeId(6);
 
-        console.log(`${window.location}?join-id=${roomId}`)
+        console.log(`${window.location}?id=${roomId}`)
 
         const ydoc = new Y.Doc();
         
