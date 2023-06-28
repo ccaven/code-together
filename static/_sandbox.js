@@ -60,7 +60,7 @@ async function generateWorker(code) {
     canvas.height = 600;
     canvas.style.top = "0px";
     canvas.style.left = "0px";
-    canvas.style.position = "absolute";
+    canvas.style.position = "fixed";
     document.body.appendChild(canvas);
 
     const offscreenCanvas = canvas.transferControlToOffscreen();

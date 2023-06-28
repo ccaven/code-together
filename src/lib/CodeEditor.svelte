@@ -11,6 +11,7 @@
     import { initSandbox } from './sandbox';
     import Examples from './Examples.svelte';
     import { keymap } from '@codemirror/view';
+    import { select_multiple_value } from 'svelte/internal';
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
 
@@ -49,6 +50,8 @@
     let state: EditorState;
     let view: EditorView;
 
+    let inviteLink: string;
+
     onMount(async () => {
 
         const urlSearchParams = new URLSearchParams(location.search);
@@ -58,6 +61,7 @@
         let roomId = urlSearchParams.has("id") ? urlSearchParams.get("id") : makeId(6);
 
         console.log(`${window.location}?id=${roomId}`)
+        inviteLink = `${window.location}?id=${roomId}`;
 
         const ydoc = new Y.Doc();
         
@@ -159,7 +163,26 @@
 
 </script>
 
+
 <div id="total-container">
+    <div id="invite">
+        {#if inviteLink}
+            Send this link to others to enable the multiplayer editor!
+            <button on:click={() => navigator.clipboard.writeText(inviteLink)}>
+                Copy Link
+            </button>
+            <span
+                style:background-color="green"
+                style:color="white"
+                style:padding="5px"
+                style:border-radius="0px"
+                style:font-family="courier new"
+            >
+                {inviteLink}
+            </span>
+            
+        {/if}
+    </div>
     <div bind:this={editorContainer} id="editor"></div>
     <div bind:this={iFrameContainer} id="result"></div>
     <div id="examples">
@@ -174,20 +197,28 @@
         margin-top: 2rem;
         display: grid;
         grid-template-columns: 1fr auto;
-        grid-template-rows: 600px auto;
+        grid-template-rows: auto 600px auto;
         border: 1px solid lightgray;
     }
 
     #editor, #result {
-        grid-row: 1;
+        grid-row: 2;
+        grid-column: 1 / 3;
     }
 
     #editor { grid-column: 1; overflow: auto; } 
     #result { grid-column: 2; } 
 
+    #invite {
+        grid-row: 1;
+        grid-column: 1 / 3;
+        padding: 15px;
+        border-bottom: 1px solid black;
+    }
+
     #examples { 
         grid-column: 1 / 3; 
-        grid-row: 2; 
+        grid-row: 3; 
         padding: 15px;
         border: 1px solid black;
     }
@@ -198,5 +229,8 @@
         overflow: hidden;
         padding: 0;
         margin: 0;
+        border: none;
+        border-right: 1px solid gray;
+        border-left: 1px solid gray;
     }
 </style>

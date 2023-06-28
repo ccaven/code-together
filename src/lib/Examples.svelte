@@ -16,7 +16,7 @@
 
 <main id="dropdown">
     
-    <h2>Load Example</h2>
+    <h2>Example Gallery</h2>
     
 
     {#each examples as example}
