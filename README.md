@@ -11,7 +11,7 @@ Code Together was intended to aid small-group peer tutoring.
     - [ ] Add documentation section
     - [ ] Add "Load from Khan Academy" option
     - [ ] Add "Save to Khan Academy" option
-    - [ ] Fix editor width
+    - [x] Fix editor width
     - [ ] Add noise/noiseSeed/loadPixels/updatePixels/imageData globals
     - [x] Fix backticks in code messing stuff up
 
