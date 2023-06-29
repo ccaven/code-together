@@ -155,8 +155,6 @@ let background,
     mask,
     getImage;
 
-let isKeyPressed;
-
 let draw;
 
 width = 600;
@@ -879,8 +877,6 @@ self.addEventListener("message", (event) => {
                 raf: -1,
                 keys: new Set(),
             };
-
-            isKeyPressed = (key) => skiJSData.keys.has(key);
 
             // FPS
             fps = 60;
