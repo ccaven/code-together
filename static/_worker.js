@@ -171,6 +171,8 @@ mouseOver = () => {};
 mouseMoved = () => {};
 keyPressed = () => {};
 keyReleased = () => {};
+mouseOver = () => {};
+mouseOut = () => {};
 mouseIsPressed = false;
 mouseButton = LEFT_BUTTON;
 mouseX = 0;
@@ -688,7 +690,6 @@ self.addEventListener("message", (event) => {
                     else scale(1, max(w, h) / min(w, h));
                 }
                 ctx.beginPath();
-                console.log(ctx.fillStyle, color(0, 0));
                 if (ctx.fillStyle != color(0, 0)) ctx.moveTo(0, 0);
                 ctx.arc(0, 0, min(w, h) / 2, degrees(start), degrees(stop));
                 if (close) ctx.closePath();
@@ -822,14 +823,17 @@ self.addEventListener("message", (event) => {
                 } else if (event.data.type == "keydown") {
                     key = event.data.key;
                     keyCode = event.data.keyCode;
-                    skiJSData.keys.add(key);
+                    //skiJSData.keys.add(key);
+                    if (keyPressed && typeof keyPressed == "function") keyPressed();
                 } else if (event.data.type == "keyup") {
                     key = event.data.key;
                     keyCode = event.data.keyCode;
-                    skiJSData.keys.delete(key);
+                    //skiJSData.keys.delete(key);
+                    if (keyReleased && typeof keyReleased == "function") keyReleased();
                 } else if (event.data.type == "mouseup") {
                     mouseButton = event.data.button;
                     mouseIsPressed = false;
+                    mouseIsReleased = true;
                 }
             });
 
@@ -1269,8 +1273,6 @@ self.addEventListener("message", (event) => {
     fill(255, 255, 255);
     stroke(0, 0, 0);
     strokeWeight(1);
-    
-    console.log(event.data.code);
 
     ((fn, args) => { 
         event=null; 
@@ -1307,13 +1309,15 @@ self.addEventListener("message", (event) => {
 
             if ((pmouseX !== mouseX || pmouseY !== mouseY) && isFn(mouseMoved))
                 mouseMoved();
-            if (mouseIsPressed && isFn(mousePressed)) mousePressed();
-            if (mouseIsReleased && isFn(mouseReleased)) {
-                mouseReleased();
-                mouseIsReleased = false;
+            if (mouseIsPressed && isFn(mousePressed))
+                mousePressed();
+            if (mouseIsReleased) {
+                if (isFn(mouseReleased)) mouseReleased();
             }
 
             if (draw) draw();
+
+            mouseIsReleased = false;
 
             pmouseX = mouseX;
             pmouseY = mouseY;

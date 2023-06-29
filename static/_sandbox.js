@@ -18,7 +18,6 @@ function setupCanvas(canvas, worker) {
     });
 
     window.addEventListener("keydown", event => {
-        console.log(event);
         worker.postMessage({
             type: "keydown",
             key: event.key,
@@ -27,7 +26,6 @@ function setupCanvas(canvas, worker) {
     });
 
     window.addEventListener("keyup", event => {
-        console.log(event);
         worker.postMessage({
             type: "keyup",
             key: event.key,
