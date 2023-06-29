@@ -22,5 +22,9 @@
     {
         "title": "Clock",
         "code": "// Let's make a clock!\n\ntextAlign(CENTER, CENTER);\ntextFont(\"Trebuchet MS\");\ntextSize(50);\nfill(0);\nnoStroke();\n\ndraw = function () {\n    background(255);\n\n    // Let's get our hour/minute/seconds\n    let h = hour();\n    let m = minute();\n    let s = seconds();\n\n    // Are we in the AM or PM?\n    let label = h > 12 ? \"pm\" : \"am\";\n\n    // Prepare each number for outputting\n    h = (h % 12).toString();\n    m = m.toString().padStart(2, \"0\");\n    s = s.toString().padStart(2, \"0\")\n    \n    text(`${h}:${m}:${s} ${label}`, 300, 300);\n};\n"
+    },
+    {
+        "title": "keyPressed and keyReleased",
+        "code": "// Create an empty object\n// to store whether each key\n// is pressed\nlet keys = {};\n\n// Set our event listeners\n// NOTE: keyPressed and keyReleased are builtins\n//       that run whenever the user presses a key\n// NOTE: \"key\" is a builtin, which is the string\n//        representation of the key, e.g.\n//        \"w\", \"a\", \"Enter\", \" \", \"Shift\"\nkeyPressed = function() {\n    keys[key] = true;\n}\nkeyReleased = function() {\n    keys[key] = false;\n}\n\n// Store the coordinates for our rectangle\nlet x = 300;\nlet y = 300;\n\n// Processing.js settings\nrectMode(CENTER);\nstrokeWeight(5);\nnoFill();\nstroke(200, 200, 200);\n\ndraw = function () {\n\n    // Check if each key is pressed\n    // using the object we set up before\n    // NOTE: keys[\"w\"] is the same as keys.w\n    if (keys.w) y -= 5;\n    if (keys.s) y += 5;\n    if (keys.a) x -= 5;\n    if (keys.d) x += 5;\n\n    // Draw rectangle\n    background(255);\n    rect(x, y, 50, 50, 10);\n}\n"
     }
 ]
