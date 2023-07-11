@@ -1,5 +1,8 @@
 <script lang='ts'>
     export let inviteLink: string;
+
+    const pathPrefix = process.env.NODE_ENV === "production" ? "/code-together" : "";
+    let copyUrl = pathPrefix + "/copy.png"
 </script>
 
 <section>
@@ -15,7 +18,7 @@
     <div style:margin-right="5px">
         <!-- <a href="https://www.flaticon.com/free-icons/copy" title="copy icons">Copy icons created by Freepik - Flaticon</a> -->
         <img 
-            src="copy.png" 
+            src={copyUrl}
             width="30px" 
             alt="" 
             on:click={() => navigator.clipboard.writeText(inviteLink)}
