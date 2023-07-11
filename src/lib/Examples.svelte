@@ -14,36 +14,53 @@
 
 </script>
 
-<main id="dropdown">
-    
+<main id="dropdown">    
     <h2>Example Gallery</h2>
-    
-
-    {#each examples as example}
-        <div>
-            <!-- svelte-ignore a11y-invalid-attribute -->
-            <a href="javascript:void(0)" on:click={()=>onclick(example)}>{example.title}</a>
-        </div>
-    {/each}
-
-
+    <section>
+        {#each examples as example}
+            <div on:click={()=>onclick(example)} on:keydown={()=>{}}>
+                <p>{example.title}</p>
+            </div>
+        {/each}
+    </section> 
 </main>
 
 <style>
     main {
         width: 100%;
         height: 100%;
+        text-align: center;
+    }
+
+    section {
+        margin: auto;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
     div {
         border: 1px solid black;
-        padding: 5px;
-        margin: 5px;
-        display: inline;
+        border-radius: 10px;
         text-decoration: none;
+        padding: 5px 15px;
+        margin: 5px 15px;
+        display: flex;
+        cursor: pointer;
+        transition: 0.5s ease;
     }
-    a {
+
+    div:hover {
+        background-color: rgb(250, 250, 250);
+        font-size: large;
+    }
+
+    p {
         text-decoration: none;
+        margin: auto;
     }
 
 </style>

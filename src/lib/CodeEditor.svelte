@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Docs from './Docs.svelte';
     import * as Y from 'yjs';
     import { yCollab } from 'y-codemirror.next';
     import { WebrtcProvider } from 'y-webrtc';
@@ -12,6 +13,7 @@
     import Examples from './Examples.svelte';
     import { keymap } from '@codemirror/view';
     import { select_multiple_value } from 'svelte/internal';
+    import InviteLink from './InviteLink.svelte';
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
 
@@ -165,24 +167,10 @@
 
 
 <div id="total-container">
-    <div id="invite">
-        {#if inviteLink}
-            Send this link to others to enable the multiplayer editor!
-            <button on:click={() => navigator.clipboard.writeText(inviteLink)}>
-                Copy Link
-            </button>
-            <span
-                style:background-color="green"
-                style:color="white"
-                style:padding="5px"
-                style:border-radius="0px"
-                style:font-family="courier new"
-            >
-                {inviteLink}
-            </span>
-            
-        {/if}
-    </div>
+    {#if inviteLink}
+        <InviteLink {inviteLink}/>
+    {/if}
+
     <div bind:this={editorContainer} id="editor"></div>
     <div bind:this={iFrameContainer} id="result"></div>
     <div id="examples">
@@ -191,6 +179,10 @@
 </div>
 
 <style>
+    :global(body) {
+        font-family: Lato, "Noto Sans", Helvetica, Corbel, sans-serif, Helvetica, Corbel, sans-serif;
+    }
+
     #total-container {
         max-width: 1200px;
         margin: auto;
@@ -198,7 +190,6 @@
         display: grid;
         grid-template-columns: 1fr auto;
         grid-template-rows: auto 600px auto;
-        border: 1px solid lightgray;
     }
 
     #editor, #result {
@@ -206,7 +197,7 @@
         grid-column: 1 / 3;
     }
 
-    #editor { grid-column: 1; overflow: auto; } 
+    #editor { grid-column: 1; overflow: auto; border-left: 1px solid gray } 
     #result { grid-column: 2; } 
 
     #invite {
@@ -220,7 +211,8 @@
         grid-column: 1 / 3; 
         grid-row: 3; 
         padding: 15px;
-        border: 1px solid black;
+        border: none;
+        border-top: 1px solid gray;
     }
 
     :global(.result-iframe) {
