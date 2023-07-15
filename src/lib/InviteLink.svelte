@@ -3,6 +3,12 @@
 
     const pathPrefix = process.env.NODE_ENV === "production" ? "/code-together" : "";
     let copyUrl = pathPrefix + "/copy.png"
+
+    function onClick() {
+        navigator.clipboard.writeText(inviteLink);
+        alert("Link copied!");
+    }
+
 </script>
 
 <section>
@@ -19,9 +25,9 @@
         <!-- <a href="https://www.flaticon.com/free-icons/copy" title="copy icons">Copy icons created by Freepik - Flaticon</a> -->
         <img 
             src={copyUrl}
-            width="30px" 
+            width="35px"
             alt="" 
-            on:click={() => navigator.clipboard.writeText(inviteLink)}
+            on:click={onClick}
             on:keydown={()=>{}}
         />
     </div>
@@ -45,12 +51,13 @@
         grid-row: 1;
         grid-column: 1 / 3;
         padding: 15px;
-        border-bottom: 1px solid black;
         display: flex;
         flex-flow: row wrap;
         border: 1px solid gray;
+        border-bottom: none;
         justify-content: center;
         font-size: medium;
+        background-color: white;
     }
 
     div {

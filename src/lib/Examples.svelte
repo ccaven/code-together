@@ -30,6 +30,7 @@
         width: 100%;
         height: 100%;
         text-align: center;
+        background-color: rgba(255, 255, 255, 0.5);
     }
 
     section {
@@ -51,6 +52,7 @@
         display: flex;
         cursor: pointer;
         transition: 0.5s ease;
+        background-color: white;
     }
 
     div:hover {
@@ -61,6 +63,14 @@
     p {
         text-decoration: none;
         margin: auto;
+    }
+
+    h2 {
+        background-color: white;
+        border-radius: 10px;
+        width: fit-content;
+        margin: auto;
+        font-size: 1.5em;
     }
 
 </style>

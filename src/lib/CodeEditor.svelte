@@ -1,19 +1,40 @@
+<script lang="ts" context="module">
+    function makeId(length: number) {
+        let result = '';
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const charactersLength = characters.length;
+        
+        let counter = 0;
+
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+        }
+
+        return result;
+    }
+</script>
+
 <script lang="ts">
-	import Docs from './Docs.svelte';
+
+    import InviteLink from './InviteLink.svelte';
+    import Examples from './Examples.svelte';
+
+    import { initSandbox } from './sandbox';
+
+    import { EditorView, basicSetup } from 'codemirror';
+    import { EditorState, Text } from "@codemirror/state";
+    import { indentWithTab } from '@codemirror/commands'
+    import { indentUnit } from '@codemirror/language'
+    import { javascript } from '@codemirror/lang-javascript';
+    import { keymap } from '@codemirror/view';
+
     import * as Y from 'yjs';
     import { yCollab } from 'y-codemirror.next';
     import { WebrtcProvider } from 'y-webrtc';
-    import { EditorView, basicSetup } from 'codemirror';
-    import { EditorState, Text, Transaction } from "@codemirror/state";
-    import { javascript } from '@codemirror/lang-javascript';
-    import { indentWithTab } from '@codemirror/commands'
-    import { indentUnit } from '@codemirror/language'
     import { onMount, setContext } from 'svelte';
-    import { initSandbox } from './sandbox';
-    import Examples from './Examples.svelte';
-    import { keymap } from '@codemirror/view';
-    import { select_multiple_value } from 'svelte/internal';
-    import InviteLink from './InviteLink.svelte';
+
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
 
@@ -30,39 +51,25 @@
 
     // select a random color for this user
     export const userColor = usercolors[Math.random() * usercolors.length | 0];
-    console.log(userColor);
-
-    function makeId(length: number) {
-        let result = '';
-
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        
-        let counter = 0;
-
-        while (counter < length) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            counter += 1;
-        }
-
-        return result;
-    }
 
     let reload: (code: string) => void;
     let state: EditorState;
     let view: EditorView;
 
     let inviteLink: string;
+    let isHost: boolean;
 
     onMount(async () => {
 
         const urlSearchParams = new URLSearchParams(location.search);
 
+        isHost = !urlSearchParams.has("id");
+
         // TODO: Make sure room id's don't overlap
         // i.e. seed with millisecond
-        let roomId = urlSearchParams.has("id") ? urlSearchParams.get("id") : makeId(6);
 
-        console.log(`${window.location}?id=${roomId}`)
+        let roomId = isHost ? makeId(4) : urlSearchParams.get("id");
+
         inviteLink = `${window.location}?id=${roomId}`;
 
         const ydoc = new Y.Doc();
@@ -86,7 +93,8 @@
         let myTheme = EditorView.theme({
             "&": {
                 width: "100%",
-                height: "600px"
+                height: "599px",
+                backgroundColor: "white"
             },
         })
 
@@ -97,7 +105,7 @@
                 javascript(),
                 yCollab(ytext, provider.awareness, { undoManager }),
                 keymap.of([indentWithTab]),
-                indentUnit.of("    "), // 4-spaces
+                indentUnit.of(" ".repeat(4)), // 4-spaces
                 myTheme
             ],
         });
@@ -137,6 +145,10 @@
 
     setContext("example-setter", (code: string) => {
         if (reload && view) {
+            if (view.state.doc.length > 0) {
+                alert("Editor must be empty to load example.");
+                return;
+            }
             // Replace editor content
             view.dispatch({
                 changes: [
@@ -167,12 +179,13 @@
 
 
 <div id="total-container">
-    {#if inviteLink}
+    {#if inviteLink && isHost}
         <InviteLink {inviteLink}/>
     {/if}
 
     <div bind:this={editorContainer} id="editor"></div>
     <div bind:this={iFrameContainer} id="result"></div>
+
     <div id="examples">
         <Examples/>
     </div>
@@ -180,7 +193,7 @@
 
 <style>
     :global(body) {
-        font-family: Lato, "Noto Sans", Helvetica, Corbel, sans-serif, Helvetica, Corbel, sans-serif;
+        font-family: Lato, "Noto Sans", Helvetica, Corbel, sans-serif;
     }
 
     #total-container {
@@ -195,17 +208,13 @@
     #editor, #result {
         grid-row: 2;
         grid-column: 1 / 3;
+        border-top: 1px solid gray;
+
+        box-shadow: 0px 0px 5px 2px lightgray;
     }
 
-    #editor { grid-column: 1; overflow: auto; border-left: 1px solid gray } 
+    #editor { grid-column: 1; overflow: auto; border-left: 1px solid gray; } 
     #result { grid-column: 2; } 
-
-    #invite {
-        grid-row: 1;
-        grid-column: 1 / 3;
-        padding: 15px;
-        border-bottom: 1px solid black;
-    }
 
     #examples { 
         grid-column: 1 / 3; 
