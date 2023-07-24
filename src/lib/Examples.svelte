@@ -3,7 +3,6 @@
 <script lang="ts">
     import { getContext } from "svelte";
 
-  
     import examples from "./all_examples.json";
 
     let exampleSetter = getContext<(code: string) => void>("example-setter");

@@ -1,10 +1,8 @@
 import Sandbox, { type Options } from 'websandbox';
 
-const pathPrefix = process.env.NODE_ENV === "production" ? "/code-together" : "";
-
 export async function initSandbox(frameContainer: HTMLDivElement) {
     const localApi = {
-        makeWorkerScript: async() => await fetch(pathPrefix + "/_worker.js").then(t=>t.blob()).then(t=>t.text())
+        makeWorkerScript: async() => await fetch("/_worker.js").then(t=>t.blob()).then(t=>t.text())
     };
 
     const sandboxOptions: Options = {
@@ -14,7 +12,7 @@ export async function initSandbox(frameContainer: HTMLDivElement) {
 
     const sandbox = await Sandbox.create(localApi, sandboxOptions).promise;
 
-    await sandbox.importScript(pathPrefix + "/_sandbox.js");
+    await sandbox.importScript("/_sandbox.js");
 
     return {
         reload(code: string) {

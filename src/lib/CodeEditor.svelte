@@ -214,7 +214,7 @@
     }
 
     #editor { grid-column: 1; overflow: auto; border-left: 1px solid gray; } 
-    #result { grid-column: 2; } 
+    #result { grid-column: 2; background-color: white;} 
 
     #examples { 
         grid-column: 1 / 3; 

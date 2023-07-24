@@ -1,8 +1,7 @@
 <script lang='ts'>
     export let inviteLink: string;
 
-    const pathPrefix = process.env.NODE_ENV === "production" ? "/code-together" : "";
-    let copyUrl = pathPrefix + "/copy.png"
+    let copyUrl = "/copy.png"
 
     function onClick() {
         navigator.clipboard.writeText(inviteLink);
