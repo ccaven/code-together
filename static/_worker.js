@@ -1323,6 +1323,6 @@ self.addEventListener("message", (event) => {
             fps = 1000 / delta;
         }
 
-        requestAnimationFrame(loop);
+        loop(performance.now());
     }
 });
