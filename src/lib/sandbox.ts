@@ -1,6 +1,7 @@
 import Sandbox, { type Options } from 'websandbox';
 
-export async function initSandbox(frameContainer: HTMLDivElement) {
+export async function initSandbox(frameContainer: HTMLDivElement, canvasSize: number = 600) {
+
     const localApi = {
         makeWorkerScript: async() => await fetch("/_worker.js").then(t=>t.blob()).then(t=>t.text())
     };
@@ -12,11 +13,17 @@ export async function initSandbox(frameContainer: HTMLDivElement) {
 
     const sandbox = await Sandbox.create(localApi, sandboxOptions).promise;
 
+    // @ts-ignore
+    document.getElementsByClassName("result-iframe").item(0).style.height = canvasSize + "px";
+    
+    // @ts-ignore
+    document.getElementsByClassName("result-iframe").item(0).style.width = canvasSize + "px";
+
     await sandbox.importScript("/_sandbox.js");
 
     return {
         reload(code: string) {
-            sandbox.run("generateWorker(\"void \"+ (function main(){"+code+"\n}).toString() + \"();\");");
+            sandbox.run("generateWorker(\"void \"+ (function main(){"+code+"\n}).toString() + \"();\", "+canvasSize+");");
         }
     };
 }

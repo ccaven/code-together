@@ -24,7 +24,7 @@
     import { initSandbox } from './sandbox';
 
     import { EditorView, basicSetup } from 'codemirror';
-    import { EditorState, Text } from "@codemirror/state";
+    import { EditorState, Text, fromCodePoint } from "@codemirror/state";
     import { indentWithTab } from '@codemirror/commands'
     import { indentUnit } from '@codemirror/language'
     import { javascript } from '@codemirror/lang-javascript';
@@ -37,6 +37,8 @@
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
+
+    export let canvasSize: number = 400;
 
     export const usercolors = [
         { color: '#30bced', light: '#30bced33' },
@@ -93,7 +95,7 @@
         let myTheme = EditorView.theme({
             "&": {
                 width: "100%",
-                height: "599px",
+                height: `${canvasSize-1}px`,
                 backgroundColor: "white"
             },
         })
@@ -115,15 +117,16 @@
             parent: editorContainer
         });
 
-        reload = (await initSandbox(iFrameContainer)).reload;
+        reload = (await initSandbox(iFrameContainer, canvasSize)).reload;
 
         let lastText = "";
-        let timeBeforeReload = 0.5;
+        let timeBeforeReload = 0.1;
         let reloaded = false;
         let lastEdit = performance.now();
 
         function pollLoop() {
             requestAnimationFrame(pollLoop);
+
             let newText = view.state.doc.toString();
 
             if (newText != lastText) {
@@ -139,6 +142,82 @@
         }  
 
         requestAnimationFrame(pollLoop);
+
+        let mouseDown = false;
+        document.body.addEventListener("mousedown", () => mouseDown = true);
+        document.body.addEventListener("mouseup", () => mouseDown = false);
+
+        let mouseX = 0, mouseY = 0, pmouseX = 0, pmouseY = 0;;
+        document.body.addEventListener("mousemove", event => {
+            pmouseX = mouseX;
+            pmouseY = mouseY;
+            mouseX = event.x;
+            mouseY = event.y;
+        });
+
+        function numberScrubberLoop() {
+            requestAnimationFrame(numberScrubberLoop);
+
+            let cursorPosition = view.state.selection.main.head;
+            let doc = view.state.doc.toString();
+            let character = doc[cursorPosition];
+            
+            if (!/\d/.test(character) || !character) return;
+
+            // detect whole number
+            let backSearchIndex = cursorPosition - 1;
+            while (backSearchIndex >= 0 && /\d|\w/.test(doc[backSearchIndex])) {
+                character = doc[backSearchIndex] + character;
+                backSearchIndex --;
+            }
+            let forwardSearchIndex = cursorPosition + 1;
+            while (forwardSearchIndex < doc.length && /\d|\w/.test(doc[forwardSearchIndex])) {
+                character = character + doc[forwardSearchIndex];
+                forwardSearchIndex ++;
+            }
+            
+            // make sure there are only numbers
+            if (!/^\d+$/.test(character)) return;
+
+            if (doc[backSearchIndex] == "-") {
+                character = "-" + character;
+                backSearchIndex --;
+            }
+
+            // if clicked & dragged
+            let value = parseInt(character);
+
+            if (mouseDown) {
+                value += mouseX - pmouseX;
+                console.log(value);                
+                // @ts-ignore
+                //view.state.doc = view.state.doc.replace(backSearchIndex, forwardSearchIndex, replaceDoc);
+                view.dispatch({
+                    changes: [
+                        {
+                            from: backSearchIndex + 1,
+                            to: forwardSearchIndex,
+                            insert: Text.of([value.toString()])
+                        }
+                    ],
+                    selection: {
+                        anchor: backSearchIndex + 1 + (value < 0 ? 1 : 0),
+                        head: backSearchIndex + 1 + (value < 0 ? 1 : 0)
+                    }
+                });
+
+            }
+
+            // we are on!
+            // get current position of cursor
+            // column / row
+
+
+            // console.log(cursorPosition, view.state.doc.toString()[cursorPosition]);
+
+        }
+
+        requestAnimationFrame(numberScrubberLoop);
 
     });
 
@@ -178,13 +257,26 @@
 </script>
 
 
-<div id="total-container">
+<div 
+    id="total-container"
+    style:grid-template-rows="auto {canvasSize}px auto"
+>
+
+    <div 
+        bind:this={editorContainer} 
+        id="editor"
+        style:height="{canvasSize}px"
+    />
+    <div 
+        bind:this={iFrameContainer} id="result"
+        style:width="{canvasSize}px"
+        style:height="{canvasSize}px"
+    />
+    <!--
     {#if inviteLink && isHost}
         <InviteLink {inviteLink}/>
     {/if}
-
-    <div bind:this={editorContainer} id="editor"></div>
-    <div bind:this={iFrameContainer} id="result"></div>
+    -->
 
     <div id="examples">
         <Examples/>
@@ -197,12 +289,11 @@
     }
 
     #total-container {
-        max-width: 1200px;
+        max-width: 1600px;
         margin: auto;
         margin-top: 2rem;
         display: grid;
         grid-template-columns: 1fr auto;
-        grid-template-rows: auto 600px auto;
     }
 
     #editor, #result {
@@ -225,8 +316,6 @@
     }
 
     :global(.result-iframe) {
-        width: 600px;
-        height: 600px;
         overflow: hidden;
         padding: 0;
         margin: 0;

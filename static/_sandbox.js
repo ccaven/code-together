@@ -44,18 +44,19 @@ function setupCanvas(canvas, worker) {
 /**
  * 
  * @param {string} code 
+ * @param {number} canvasSize
  */
-async function generateWorker(code) {
+async function generateWorker(code, canvasSize=600) {
     if (cachedCanvas) document.body.removeChild(cachedCanvas);
     if (cachedWorker) cachedWorker.terminate();
 
     const workerScript = await Websandbox.connection.remote.makeWorkerScript();
 
     const canvas = document.createElement("canvas");
-    canvas.style.width = "600px";
-    canvas.style.height = "600px";
-    canvas.width = 600;
-    canvas.height = 600;
+    canvas.style.width = `${canvasSize}px`;
+    canvas.style.height = `${canvasSize}px`;
+    canvas.width = canvasSize;
+    canvas.height = canvasSize;
     canvas.style.top = "0px";
     canvas.style.left = "0px";
     canvas.style.position = "fixed";
