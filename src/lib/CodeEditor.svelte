@@ -60,6 +60,7 @@
 
     let inviteLink: string;
     let isHost: boolean;
+    let scrubberDiv: HTMLDivElement | null;
 
     onMount(async () => {
 
@@ -162,7 +163,10 @@
             let doc = view.state.doc.toString();
             let character = doc[cursorPosition];
             
-            if (!/\d/.test(character) || !character) return;
+            if (!/\d/.test(character) || !character) {
+                if (scrubberDiv != null) scrubberDiv.style.display = "none";
+                return;
+            }
 
             // detect whole number
             let backSearchIndex = cursorPosition - 1;
@@ -177,7 +181,29 @@
             }
             
             // make sure there are only numbers
-            if (!/^\d+$/.test(character)) return;
+            if (!/^\d+$/.test(character)) {
+                if (scrubberDiv != null) scrubberDiv.style.display = "none";
+                return;
+            }
+
+            const rect = view.coordsAtPos(backSearchIndex + 1);
+            
+            if (scrubberDiv != null) {
+                scrubberDiv.style.top = rect?.top + "px";
+                scrubberDiv.style.left = rect?.left + "px";
+                scrubberDiv.style.display = "";
+
+                let scrubberRect = scrubberDiv.getBoundingClientRect();
+                let mouseInsideY = mouseY > scrubberRect.bottom && mouseY < scrubberRect.bottom + scrubberRect.height;
+                let mouseInsideX = mouseX > scrubberRect.left && mouseX < scrubberRect.left + scrubberRect.width;
+            
+                if (mouseInsideX && mouseInsideY && mouseDown) {
+                    // @ts-ignore
+                    scrubberDiv.children[0].style.transform = `translateX(${mouseX - scrubberRect.left})`
+                }
+            }
+
+            console.log(rect);
 
             if (doc[backSearchIndex] == "-") {
                 character = "-" + character;
@@ -187,6 +213,7 @@
             // if clicked & dragged
             let value = parseInt(character);
 
+            
             if (mouseDown) {
                 value += mouseX - pmouseX;
                 console.log(value);                
@@ -205,6 +232,8 @@
                         head: backSearchIndex + 1 + (value < 0 ? 1 : 0)
                     }
                 });
+
+
 
             }
 
@@ -281,6 +310,24 @@
     <div id="examples">
         <Examples/>
     </div>
+</div>
+
+<div 
+    id="scrubber"
+    style:position="absolute"
+    style:display="none"
+    bind:this={scrubberDiv}
+>
+    <div>
+        <div
+            style:width="50px"
+            style:height="10px"
+            style:background-color="black"
+            style:transform="translateY(-20px)"
+        />
+    </div>
+    
+
 </div>
 
 <style>
