@@ -76,7 +76,8 @@
         
         const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
             signaling: [
-                "wss://signal-us-east-1d.xacer.dev:443"
+                //"wss://signal-us-east-1d.xacer.dev:443",
+                "wss://yrs-signal.shuttleapp.rs/signaling"
             ]
         });
 
