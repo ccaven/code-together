@@ -1,5 +1,9 @@
 <script lang='ts'>
     import CodeEditor from "$lib/CodeEditor.svelte";
+    import Examples from "$lib/Examples.svelte";
+    import InviteLink from "$lib/InviteLink.svelte";
+
+    let codeEditor: CodeEditor;
 </script>
 <!--
 <CodeEditor/>
@@ -9,7 +13,14 @@
 <div id="background-2" class="absolute w-full h-full"></div>
 <div id="background-3" class="absolute w-full h-full"></div>
 
-<CodeEditor/>
+<InviteLink {codeEditor}/>
+
+<div class="m-8">
+    <CodeEditor bind:this={codeEditor}/>
+</div>
+<div class="px-16">
+    <Examples {codeEditor}/>
+</div>
 
 
 <style>
