@@ -18,9 +18,6 @@
 
 <script lang="ts">
 
-    import InviteLink from './InviteLink.svelte';
-    import Examples from './Examples.svelte';
-
     import { initSandbox } from './sandbox';
 
     import { EditorView, basicSetup } from 'codemirror';
@@ -34,6 +31,7 @@
     import { yCollab } from 'y-codemirror.next';
     import { WebrtcProvider } from 'y-webrtc';
     import { onMount, setContext } from 'svelte';
+    import { writable } from 'svelte/store';
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
@@ -56,7 +54,7 @@
     let state: EditorState;
     let view: EditorView;
 
-    let inviteLink: string;
+    let inviteLink = writable("");
     let isHost: boolean;
 
     onMount(async () => {
@@ -65,18 +63,16 @@
 
         isHost = !urlSearchParams.has("id");
 
-        // TODO: Make sure room id's don't overlap
-        // i.e. seed with millisecond
+        let width = Number.parseInt(urlSearchParams.get("width") ?? "400") ?? 400;
 
         let roomId = isHost ? makeId(4) : urlSearchParams.get("id");
 
-        inviteLink = `${window.location}?id=${roomId}`;
+        inviteLink.set(`${window.location}?id=${roomId}`);
 
         const ydoc = new Y.Doc();
         
         const provider = new WebrtcProvider(`codemirror6-editor-${roomId}`, ydoc, {
             signaling: [
-                //"wss://signal-us-east-1d.xacer.dev:443",
                 "wss://yrs-signal.shuttleapp.rs/signaling"
             ]
         });
@@ -94,7 +90,7 @@
         let myTheme = EditorView.theme({
             "&": {
                 width: "100%",
-                height: "599px",
+                height: `${width-1}px`,
                 backgroundColor: "white"
             },
         })
@@ -116,7 +112,16 @@
             parent: editorContainer
         });
 
-        reload = (await initSandbox(iFrameContainer)).reload;
+        iFrameContainer.style.width = `${width}px`;
+
+        reload = (await initSandbox(iFrameContainer, width)).reload;
+
+        let resultIFrame = document.getElementsByClassName("result-iframe")[0] as HTMLIFrameElement;
+
+        resultIFrame.style.width = `${width}px`;
+        resultIFrame.style.height = `${width}px`;
+        resultIFrame.style.border = `none`;
+        resultIFrame.style.borderLeft = `1px solid gray`;
 
         let lastText = "";
         let timeBeforeReload = 0.5;
@@ -143,6 +148,31 @@
 
     });
 
+    export function setText(code: string) {
+        if (reload && view) {
+            if (view.state.doc.length > 0) {
+                alert("Editor must be empty to load example.");
+                return;
+            }
+            // Replace editor content
+            view.dispatch({
+                changes: [
+                    {
+                        from: 0, 
+                        to: view.state.doc.length, 
+                        insert: Text.of(code.split("\n")),
+                        
+                    }
+                ],
+            });
+
+            reload(code);
+        }
+    }
+
+    export function getInviteLink() {
+        return inviteLink;
+    }
 
     setContext("example-setter", (code: string) => {
         if (reload && view) {
@@ -178,61 +208,11 @@
 
 </script>
 
+<div class="overflow-hidden"></div>
 
-<div id="total-container">
-    {#if inviteLink && isHost}
-        <InviteLink {inviteLink}/>
-    {/if}
-
-    <div bind:this={editorContainer} id="editor"></div>
-    <div bind:this={iFrameContainer} id="result"></div>
-
-    <div id="examples">
-        <Examples/>
+<div>
+    <div class="max-w-5xl m-auto flex border-gray-300 border-2">
+        <div bind:this={editorContainer} class="flex-initial w-full"></div>
+        <div bind:this={iFrameContainer} class="flex-initial w-[400px]"></div>
     </div>
 </div>
-
-<style>
-    :global(body) {
-        font-family: Lato, "Noto Sans", Helvetica, Corbel, sans-serif;
-    }
-
-    #total-container {
-        max-width: 1200px;
-        margin: auto;
-        margin-top: 2rem;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        grid-template-rows: auto 600px auto;
-    }
-
-    #editor, #result {
-        grid-row: 2;
-        grid-column: 1 / 3;
-        border-top: 1px solid gray;
-
-        box-shadow: 0px 0px 5px 2px lightgray;
-    }
-
-    #editor { grid-column: 1; overflow: auto; border-left: 1px solid gray; } 
-    #result { grid-column: 2; background-color: white;} 
-
-    #examples { 
-        grid-column: 1 / 3; 
-        grid-row: 3; 
-        padding: 15px;
-        border: none;
-        border-top: 1px solid gray;
-    }
-
-    :global(.result-iframe) {
-        width: 600px;
-        height: 600px;
-        overflow: hidden;
-        padding: 0;
-        margin: 0;
-        border: none;
-        border-right: 1px solid gray;
-        border-left: 1px solid gray;
-    }
-</style>

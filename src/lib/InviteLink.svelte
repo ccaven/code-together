@@ -1,10 +1,20 @@
 <script lang='ts'>
-    export let inviteLink: string;
+	import type CodeEditor from './CodeEditor.svelte';
+    import { writable } from 'svelte/store';
+    export let codeEditor: CodeEditor;
 
     let copyUrl = "/copy.png"
 
+    let inviteLink = writable("");
+
+    $: {
+        if (codeEditor) {
+            codeEditor.getInviteLink().subscribe(inviteLink.set);
+        }
+    }
+
     function onClick() {
-        navigator.clipboard.writeText(inviteLink);
+        navigator.clipboard.writeText($inviteLink);
         alert("Link copied!");
     }
 
@@ -39,7 +49,7 @@
             style:border-radius="0px"
             style:font-family="courier new"
         >
-            {inviteLink}
+            {$inviteLink}
         </span>
     </div>
         

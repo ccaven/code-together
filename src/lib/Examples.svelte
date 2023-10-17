@@ -1,14 +1,11 @@
 
 <!-- This is a little section under the code editor -->
 <script lang="ts">
-    import { getContext } from "svelte";
-
     import examples from "./all_examples.json";
-
-    let exampleSetter = getContext<(code: string) => void>("example-setter");
-
+    import type CodeEditor from "./CodeEditor.svelte";
+    export let codeEditor: CodeEditor;
     function onclick({ code }: typeof examples[0]) {
-        exampleSetter(code);
+        codeEditor.setText(code);
     }
 
 </script>
