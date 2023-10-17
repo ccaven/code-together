@@ -1,6 +1,6 @@
 import Sandbox, { type Options } from 'websandbox';
 
-export async function initSandbox(frameContainer: HTMLDivElement) {
+export async function initSandbox(frameContainer: HTMLDivElement, width: number) {
     const localApi = {
         makeWorkerScript: async() => await fetch("/_worker.js").then(t=>t.blob()).then(t=>t.text())
     };
