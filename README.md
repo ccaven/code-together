@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./static/icon3.png" alt="logo">
+    <img src="./static/icon4.png" alt="logo">
 </p>
 
 Multiplayer code editor inspired by [Khan Academy's Embedded Editor](https://www.khanacademy.org/computer-programming/new/pjs), built using Svelte and TypeScript.
