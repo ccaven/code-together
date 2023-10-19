@@ -1,8 +1,6 @@
-<center>
+<p align="center">
     <img src="./static/icon3.png" alt="logo">
-</center>
-
-# Code Together
+</p>
 
 Multiplayer code editor inspired by [Khan Academy's Embedded Editor](https://www.khanacademy.org/computer-programming/new/pjs), built using Svelte and TypeScript.
 
@@ -29,3 +27,7 @@ The editor supports most of the same **Processing.js** library that Khan Academy
 1. Loading and saving from **Khan Academy**. The vision is for two Khan Academy users to be able to work simultaneously on a project by loading it into Code Together, editing the code, then saving it back to a Khan Academy project.
 2. Quality of life features such as **number scrubbing** and **color pickers**. I'm working on number scrubbing in the `number-scrubber` branch.
 3. Helpful **error messages**. It would be awesome to somehow incorporate Large Language Models to get personalized feedback; in the meantime, I may end up creating a better version of Error Buddy (from Khan Academy's editor).
+
+## Credits
+
+Thanks to DesignEvo for the free logo creator.
