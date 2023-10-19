@@ -1,3 +1,7 @@
+<center>
+    <img src="./static/icon3.png" alt="logo">
+</center>
+
 # Code Together
 
 Multiplayer code editor inspired by [Khan Academy's Embedded Editor](https://www.khanacademy.org/computer-programming/new/pjs), built using Svelte and TypeScript.
