@@ -35,6 +35,7 @@
 
     let iFrameContainer: HTMLDivElement;
     let editorContainer: HTMLDivElement;
+    let totalContainer: HTMLDivElement;
 
     export const usercolors = [
         { color: '#30bced', light: '#30bced33' },
@@ -65,6 +66,9 @@
 
         let width = Number.parseInt(urlSearchParams.get("width") ?? "400") ?? 400;
 
+        let noEditor = urlSearchParams.get("editor") == "no";
+        console.log(noEditor);
+
         let roomId = isHost ? makeId(4) : urlSearchParams.get("id");
 
         inviteLink.set(`${window.location}?id=${roomId}`);
@@ -91,11 +95,16 @@
 
         let myTheme = EditorView.theme({
             "&": {
-                width: "100%",
+                width: noEditor ? "0%" : "100%",
                 height: `${width-1}px`,
-                backgroundColor: "white"
+                backgroundColor: "white",
             }            
         })
+
+        if (noEditor) {
+            (totalContainer.children[0] as HTMLDivElement).style.display = "none";
+            totalContainer.style.width = `${width+5}px`;
+        }
 
         state = EditorState.create({
             doc: ytext.toString(),
@@ -113,11 +122,10 @@
             state, 
             parent: editorContainer
         });
-
-        iFrameContainer.style.width = `${width}px`;
+        
 
         reload = (await initSandbox(iFrameContainer, width)).reload;
-
+    
         let resultIFrame = document.getElementsByClassName("result-iframe")[0] as HTMLIFrameElement;
 
         resultIFrame.style.width = `${width}px`;
@@ -132,8 +140,15 @@
 
         function pollLoop() {
             requestAnimationFrame(pollLoop);
-            let newText = view.state.doc.toString();
 
+            if (!view) {
+
+            }
+
+            let newText = view ? view.state.doc.toString() : ytext._item?.content.getContent().join("");
+
+            if (!newText) return;
+            
             if (newText != lastText) {
                 lastEdit = performance.now();
                 lastText = newText;
@@ -213,7 +228,7 @@
 <div class="overflow-hidden"></div>
 
 <div>
-    <div class="max-w-5xl m-auto flex border-gray-300 border-2">
+    <div class="max-w-5xl m-auto flex border-gray-300 border-2" bind:this={totalContainer}>
         <div bind:this={editorContainer} class="flex-initial w-full"></div>
         <div bind:this={iFrameContainer} class="flex-initial w-[400px]"></div>
     </div>
