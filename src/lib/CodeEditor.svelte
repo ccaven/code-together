@@ -24,7 +24,7 @@
     import { EditorState, Text } from "@codemirror/state";
     import { indentWithTab } from '@codemirror/commands'
     import { indentUnit } from '@codemirror/language'
-    import { javascript } from '@codemirror/lang-javascript';
+    import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
     import { keymap } from '@codemirror/view';
 
     import * as Y from 'yjs';
@@ -81,8 +81,10 @@
 
         const undoManager = new Y.UndoManager(ytext);
 
+        let name = urlSearchParams.get("name") ?? 'Anonymous ' + Math.floor(Math.random() * 100);
+
         provider.awareness.setLocalStateField('user', {
-            name: 'Anonymous ' + Math.floor(Math.random() * 100),
+            name: name,
             color: userColor.color,
             colorLight: userColor.light
         })
@@ -92,7 +94,7 @@
                 width: "100%",
                 height: `${width-1}px`,
                 backgroundColor: "white"
-            },
+            }            
         })
 
         state = EditorState.create({
@@ -216,3 +218,9 @@
         <div bind:this={iFrameContainer} class="flex-initial w-[400px]"></div>
     </div>
 </div>
+
+<style>
+    :global(.cm-tooltip-autocomplete) {
+        display: none;
+    }
+</style>
