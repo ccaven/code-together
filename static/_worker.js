@@ -209,15 +209,29 @@ HEX = "hex";
 LEFT_BUTTON = 0;
 RIGHT_BUTTON = 2;
 
+let canvas;
+let ctx;
+
 self.addEventListener("message", (event) => {
     if (event.data.type != "init") {
         return;
     }
 
-    {
-        let canvas = event.data.canvas;
-        let ctx = canvas.getContext("2d");
+    if (event.data.canvas) {
+        canvas = event.data.canvas;
+        ctx = canvas.getContext('2d');
+    }
 
+    // Cancel all existing animation frames
+    {
+        let raf = requestAnimationFrame(() => {});
+        while (raf >= 0) {
+            cancelAnimationFrame(raf);
+            raf -= 1;
+        }
+    }
+
+    {
         void function () {
             /**
              * sets the background for the canvas
@@ -1270,11 +1284,15 @@ self.addEventListener("message", (event) => {
     stroke(0, 0, 0);
     strokeWeight(1);
 
-    ((fn, args) => { 
+    ((fn, args, canvas, ctx) => { 
         event=null; 
+        canvas=null;
+        ctx=null;
         delete event;
+        delete canvas;
+        delete ctx;
         fn(args); 
-    })(eval, event.data.code);
+    })(eval, event.data.code, null, null);
 
     // event = null;
     // delete event;
@@ -1307,8 +1325,8 @@ self.addEventListener("message", (event) => {
                 mouseMoved();
             if (mouseIsPressed && isFn(mousePressed))
                 mousePressed();
-            if (mouseIsReleased) {
-                if (isFn(mouseReleased)) mouseReleased();
+            if (mouseIsReleased && isFn(mouseReleased)) {
+                mouseReleased();
             }
 
             if (draw) draw();

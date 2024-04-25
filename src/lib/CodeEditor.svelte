@@ -92,7 +92,7 @@
             name: name,
             color: userColor.color,
             colorLight: userColor.light
-        })
+        });
 
         let myTheme = EditorView.theme({
             "&": {
@@ -100,7 +100,7 @@
                 height: `${width-1}px`,
                 backgroundColor: "white",
             }            
-        })
+        });
 
         if (noEditor) {
             (totalContainer.children[0] as HTMLDivElement).style.display = "none";
@@ -135,7 +135,7 @@
         resultIFrame.style.borderLeft = `1px solid gray`;
 
         let lastText = "";
-        let timeBeforeReload = 0.5;
+        let timeBeforeReload = 0.2;
         let reloaded = false;
         let lastEdit = performance.now();
 

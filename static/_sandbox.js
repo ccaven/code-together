@@ -1,4 +1,10 @@
+/** @type {HTMLCanvasElement} */
 let cachedCanvas;
+
+/** @type {OffscreenCanvas} */
+let cachedOffscreenCanvas;
+
+/** @type {Worker} */
 let cachedWorker;
 
 function setupCanvas(canvas, worker) {
@@ -45,7 +51,12 @@ function setupCanvas(canvas, worker) {
  * 
  * @param {string} code 
  */
-async function generateWorker(code) {
+async function generateWorker(code, regenerate) {
+    if (!regenerate && cachedWorker) {
+        cachedWorker.postMessage({ type: "init", code: code });
+        return;
+    }
+
     if (cachedCanvas) document.body.removeChild(cachedCanvas);
     if (cachedWorker) cachedWorker.terminate();
 
@@ -77,4 +88,5 @@ async function generateWorker(code) {
 
     cachedWorker = worker;
     cachedCanvas = canvas;
+    cachedOffscreenCanvas = offscreenCanvas;
 }
