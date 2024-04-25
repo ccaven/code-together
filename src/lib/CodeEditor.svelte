@@ -244,18 +244,27 @@
             
         }
 
-        scrubber.addEventListener("mousedown", (event) => {
+        scrubber.addEventListener("focusin", () => {
             isMouseDown = true;
         });
+
+        scrubber.addEventListener("focusout", () => {
+            resetNumberScrubber();
+            isMouseDown = false;
+        });
+
+        // scrubber.addEventListener("mousedown", (event) => {
+        //     isMouseDown = true;
+        // });
 
         // addEventListener("mousedown", (event) => {
         //     isMouseDown = true;
         // });
 
-        addEventListener("mouseup", (event) => {
-            resetNumberScrubber();
-            isMouseDown = false;
-        });
+        // addEventListener("mouseup", (event) => {
+        //     resetNumberScrubber();
+        //     isMouseDown = false;
+        // });
 
         requestAnimationFrame(numberScrubberLoop);
         requestAnimationFrame(pollLoop);
