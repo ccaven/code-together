@@ -160,60 +160,14 @@ let draw;
 width = 600;
 height = 600;
 
-// event handlers
-mouseReleased = () => {};
-mouseScrolled = () => {};
-mouseClicked = () => {};
-mouseOut = () => {};
-mouseOver = () => {};
-mouseMoved = () => {};
-keyPressed = () => {};
-keyReleased = () => {};
-mouseOver = () => {};
-mouseOut = () => {};
-mouseIsPressed = false;
-mouseButton = LEFT_BUTTON;
-mouseX = 0;
-mouseY = 0;
-pmouseX = mouseX;
-pmouseY = mouseY;
-
-BACKSPACE = 8;
-TAB = 9;
-ENTER = 13;
-SHIFT = 16;
-CONTROL = 17;
-ALT = 18;
-ESCAPE = 27;
-SPACE = 32;
-LEFT = 37;
-RIGHT = 39;
-UP = 38;
-DOWN = 40;
-//mostly for drawin' stuff on the canvas
-CORNER = 0;
-CENTER = 1;
-CLOSE = true;
-SQUARE = atob("YnV0dA=="); //yeah, srsly.
-ROUND = "round";
-PROJECT = "square";
-MITER = "iter";
-BEVEL = "bevel";
-DEGREES = "deg";
-RADIANS = "rad";
-PI = Math.PI;
-TAU = PI * 2;
-RGBA = "rgba";
-HSL = "hsl";
-HEX = "hex";
-LEFT_BUTTON = 0;
-RIGHT_BUTTON = 2;
-
 let canvas;
 let ctx;
+let raf;
 
 self.addEventListener("message", (event) => {
     if (event.data.type != "init") {
+        // Return "pong" message
+        postMessage({ type: "pong" });
         return;
     }
 
@@ -224,14 +178,60 @@ self.addEventListener("message", (event) => {
 
     // Cancel all existing animation frames
     {
-        let raf = requestAnimationFrame(() => {});
-        while (raf >= 0) {
-            cancelAnimationFrame(raf);
-            raf -= 1;
-        }
+        cancelAnimationFrame(raf);
+        
     }
 
     {
+        mouseReleased = () => {};
+        mouseScrolled = () => {};
+        mouseClicked = () => {};
+        mouseOut = () => {};
+        mouseOver = () => {};
+        mouseMoved = () => {};
+        keyPressed = () => {};
+        keyReleased = () => {};
+        mouseOver = () => {};
+        mouseOut = () => {};
+        draw = () => {};
+        mouseIsPressed = false;
+        mouseButton = LEFT_BUTTON;
+        mouseX = 0;
+        mouseY = 0;
+        pmouseX = mouseX;
+        pmouseY = mouseY;
+
+        BACKSPACE = 8;
+        TAB = 9;
+        ENTER = 13;
+        SHIFT = 16;
+        CONTROL = 17;
+        ALT = 18;
+        ESCAPE = 27;
+        SPACE = 32;
+        LEFT = 37;
+        RIGHT = 39;
+        UP = 38;
+        DOWN = 40;
+        //mostly for drawin' stuff on the canvas
+        CORNER = 0;
+        CENTER = 1;
+        CLOSE = true;
+        SQUARE = atob("YnV0dA=="); //yeah, srsly.
+        ROUND = "round";
+        PROJECT = "square";
+        MITER = "iter";
+        BEVEL = "bevel";
+        DEGREES = "deg";
+        RADIANS = "rad";
+        PI = Math.PI;
+        TAU = PI * 2;
+        RGBA = "rgba";
+        HSL = "hsl";
+        HEX = "hex";
+        LEFT_BUTTON = 0;
+        RIGHT_BUTTON = 2;
+
         void function () {
             /**
              * sets the background for the canvas
@@ -1284,19 +1284,7 @@ self.addEventListener("message", (event) => {
     stroke(0, 0, 0);
     strokeWeight(1);
 
-    ((fn, args, canvas, ctx) => { 
-        event=null; 
-        canvas=null;
-        ctx=null;
-        delete event;
-        delete canvas;
-        delete ctx;
-        fn(args); 
-    })(eval, event.data.code, null, null);
-
-    // event = null;
-    // delete event;
-    // eval(event.data.code);
+    eval(event.data.code);
 
     {
         function isFn(fn) {
@@ -1308,7 +1296,7 @@ self.addEventListener("message", (event) => {
         then = performance.now();
         skiJSData.start = performance.now();
         function loop(time) {
-            requestAnimationFrame(loop);
+            raf = requestAnimationFrame(loop);
 
             delta = time - then;
             let ms = 1000 / skiJSData.rate;
@@ -1341,6 +1329,7 @@ self.addEventListener("message", (event) => {
             fps = 1000 / delta;
         }
 
+        cancelAnimationFrame(raf);
         loop(performance.now());
     }
 });
