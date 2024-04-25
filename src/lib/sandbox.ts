@@ -14,10 +14,12 @@ export async function initSandbox(frameContainer: HTMLDivElement, width: number)
 
     await sandbox.importScript("/_sandbox.js");
 
-    return {
-        reload(code: string, regenerate: boolean = false) {
-            sandbox.run("generateWorker(\"void \"+ (function main(){let canvas=null; let ctx=null; delete canvas; delete ctx;"+code+"\n}).toString() + \"();\", " + regenerate.toString() + ");");
-        }
-    };
+    function reload (code: string, regenerate: boolean = false) {
+        sandbox.run("generateWorker(\"void \"+ (function main(){let canvas=null; let ctx=null; delete canvas; delete ctx;"+code+"\n}).toString() + \"();\", " + regenerate.toString() + ");");
+    }
+
+    reload("");
+
+    return { reload };
 }
 
