@@ -58,6 +58,8 @@
     let inviteLink = writable("");
     let isHost: boolean;
 
+    let scrubber: HTMLInputElement;
+
     onMount(async () => {
 
         const urlSearchParams = new URLSearchParams(location.search);
@@ -160,8 +162,102 @@
                 reload(newText);
                 reloaded = true;
             }
-        }  
+        }
 
+        let scrubberActive = false;
+        let scrubberAnchorValue = 0;
+        let isMouseDown = false;
+
+        function resetNumberScrubber() {
+            scrubber.value = "0";
+            scrubberActive = false;
+        }
+
+        function numberScrubberLoop() {
+            requestAnimationFrame(numberScrubberLoop);
+
+            let cursorPosition = view.state.selection.main.head;
+            let doc = view.state.doc.toString();
+            let character = doc[cursorPosition];
+
+            // Not in a number
+            // if (!/\d/.test(character) || !character) {
+            //     resetNumberScrubber();
+            //     return;
+            // }
+
+            // detect whole number
+            let backSearchIndex = cursorPosition - 1;
+            while (backSearchIndex >= 0 && /\d|\w/.test(doc[backSearchIndex])) {
+                character = doc[backSearchIndex] + character;
+                backSearchIndex --;
+            }
+            let forwardSearchIndex = cursorPosition + 1;
+            while (forwardSearchIndex < doc.length && /\d|\w/.test(doc[forwardSearchIndex])) {
+                character = character + doc[forwardSearchIndex];
+                forwardSearchIndex ++;
+            }
+
+            // make sure there are only numbers
+            if (!(/^\d+$/.test(character))) {
+                resetNumberScrubber();
+                return;
+            }
+
+            if (doc[backSearchIndex] == "-") {
+                character = "-" + character;
+                backSearchIndex --;
+            }
+
+            let curValue = parseInt(character);
+            
+            // Otherwise:
+            // If the scrubber is already active, set the character to the anchor + scrubber value
+            if (scrubberActive) {
+
+                let value = scrubberAnchorValue + parseInt(scrubber.value);
+
+                let furthestBackSelection = backSearchIndex + 1 + (value < 0 ? 1 : 0);
+
+                view.dispatch({
+                    changes: [
+                        {
+                            from: backSearchIndex + 1,
+                            to: forwardSearchIndex,
+                            insert: Text.of([value.toString()])
+                        }
+                    ],
+                    selection: {
+                        anchor: furthestBackSelection,
+                        head: furthestBackSelection
+                    }
+                });
+
+                reload(view.state.doc.toString());
+            } 
+            
+            // if the scrubber is not active, set the anchor
+            else if (isMouseDown) {
+                scrubberActive = true;
+                scrubberAnchorValue = curValue;
+            }
+            
+        }
+
+        scrubber.addEventListener("mousedown", (event) => {
+            isMouseDown = true;
+        });
+
+        // addEventListener("mousedown", (event) => {
+        //     isMouseDown = true;
+        // });
+
+        addEventListener("mouseup", (event) => {
+            resetNumberScrubber();
+            isMouseDown = false;
+        });
+
+        requestAnimationFrame(numberScrubberLoop);
         requestAnimationFrame(pollLoop);
 
     });
@@ -233,10 +329,53 @@
         <div bind:this={editorContainer} class="flex-initial w-full"></div>
         <div bind:this={iFrameContainer} class="flex-initial w-[400px]"></div>
     </div>
+
+    <!-- Slider -->
+    <div class="max-w-5xl m-auto flex border-gray-300 border-2">
+        <div class="mx-auto my-2 py-0 w-1/2">
+            <input type="range" min="-200" max="200" value="0" class="slider" bind:this={scrubber}/>
+        </div>
+    </div>
 </div>
 
 <style>
     :global(.cm-tooltip-autocomplete) {
         display: none;
+    }
+
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%; /* Full-width */
+        height: 10px; /* Specified height */
+        border-radius: 5px;
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        border-radius: 50%;
+        background: #04AA6D; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        border-radius: 50%;
+        background: #04AA6D; /* Green background */
+        cursor: pointer; /* Cursor on hover */
     }
 </style>
