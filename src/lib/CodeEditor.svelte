@@ -137,31 +137,28 @@
         resultIFrame.style.borderLeft = `1px solid gray`;
 
         let lastText = "";
-        let timeBeforeReload = 0.2;
+        let timeBeforeReload = 0.1;
         let reloaded = false;
         let lastEdit = performance.now();
 
         function pollLoop() {
             requestAnimationFrame(pollLoop);
 
-            if (!view) {
-
-            }
-
             let newText = view ? view.state.doc.toString() : ytext._item?.content.getContent().join("");
 
             if (!newText) return;
             
             if (newText != lastText) {
-                lastEdit = performance.now();
-                lastText = newText;
-                reloaded = false;
+                reload(newText);
+                // lastEdit = performance.now();
+                // lastText = newText;
+                // reloaded = false;
             }
 
-            if (!reloaded && performance.now() > lastEdit + timeBeforeReload * 1e3) {
-                reload(newText);
-                reloaded = true;
-            }
+            // if (!reloaded /* && performance.now() > lastEdit + timeBeforeReload * 1e3*/ ) {
+            //     reload(newText);
+            //     reloaded = true;
+            // }
         }
 
         let scrubberActive = false;
