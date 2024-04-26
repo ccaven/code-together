@@ -87,7 +87,6 @@ async function generateWorker(code, regenerate) {
     worker.postMessage({ canvas: offscreenCanvas, type: "init", code: code }, [offscreenCanvas]);
 
     worker.addEventListener("message", () => {
-        console.log("Received pong.");
         pongTimer = 0;
     });
 
@@ -103,6 +102,7 @@ async function generateWorker(code, regenerate) {
 
             cachedCanvas = null;
             cachedWorker = null;
+            
             console.log("Terminated due to infinite loop.");
 
             pongTimer = 0;
