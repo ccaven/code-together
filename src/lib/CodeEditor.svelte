@@ -239,6 +239,7 @@
             
             // if the scrubber is not active, set the anchor
             else if (isMouseDown) {
+                console.log("Set scrubber anchor.");
                 scrubberActive = true;
                 scrubberAnchorValue = curValue;
                 lastScrubberLocalValue = parseInt(scrubber.value);
