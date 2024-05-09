@@ -24,7 +24,7 @@
     import { EditorState, Text } from "@codemirror/state";
     import { indentWithTab } from '@codemirror/commands'
     import { indentUnit } from '@codemirror/language'
-    import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
+    import { javascript } from '@codemirror/lang-javascript';
     import { keymap } from '@codemirror/view';
 
     import * as Y from 'yjs';
@@ -69,7 +69,6 @@
         let width = Number.parseInt(urlSearchParams.get("width") ?? "400") ?? 400;
 
         let noEditor = urlSearchParams.get("editor") == "no";
-        console.log(noEditor);
 
         let roomId = isHost ? makeId(4) : urlSearchParams.get("id");
 
@@ -100,7 +99,7 @@
             "&": {
                 width: noEditor ? "0%" : "100%",
                 height: `${width-1}px`,
-                backgroundColor: "white",
+                backgroundColor: "white"
             }            
         });
 
@@ -182,12 +181,6 @@
             let doc = view.state.doc.toString();
             let character = doc[cursorPosition];
 
-            // Not in a number
-            // if (!/\d/.test(character) || !character) {
-            //     resetNumberScrubber();
-            //     return;
-            // }
-
             // detect whole number
             let backSearchIndex = cursorPosition - 1;
             while (backSearchIndex >= 0 && /\d|\w/.test(doc[backSearchIndex])) {
@@ -262,30 +255,19 @@
             isMouseDown = false;
         });
 
-        // scrubber.addEventListener("mousedown", (event) => {
-        //     isMouseDown = true;
-        // });
-
-        // addEventListener("mousedown", (event) => {
-        //     isMouseDown = true;
-        // });
-
-        // addEventListener("mouseup", (event) => {
-        //     resetNumberScrubber();
-        //     isMouseDown = false;
-        // });
-
         requestAnimationFrame(numberScrubberLoop);
         requestAnimationFrame(pollLoop);
 
     });
 
+    // Used by Examples bar
     export function setText(code: string) {
         if (reload && view) {
             if (view.state.doc.length > 0) {
                 alert("Editor must be empty to load example.");
                 return;
             }
+
             // Replace editor content
             view.dispatch({
                 changes: [
@@ -330,7 +312,7 @@
 
     // Helper function for adding examples faster
     // @ts-ignore
-    window["exportCode"] = function (title: string) {
+    window["exportCode"] = function(title: string) {
         if (view) {
             const code = view.state.doc.toString();
             title = title.toString();
@@ -343,7 +325,7 @@
 <div class="overflow-hidden"></div>
 
 <div>
-    <div class="max-w-5xl m-auto flex border-gray-300 border-2" bind:this={totalContainer}>
+    <div class="max-w-5xl m-auto flex border-gray-300 border-2 overflow-hidden" bind:this={totalContainer}>
         <div bind:this={editorContainer} class="flex-initial w-full"></div>
         <div bind:this={iFrameContainer} class="flex-initial w-[400px]"></div>
     </div>
