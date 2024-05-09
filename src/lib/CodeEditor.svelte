@@ -144,25 +144,30 @@
         function pollLoop() {
             requestAnimationFrame(pollLoop);
 
+            if (scrubberActive) return;
+
             let newText = view ? view.state.doc.toString() : ytext._item?.content.getContent().join("");
 
             if (!newText) return;
             
             if (newText != lastText) {
-                reload(newText);
-                // lastEdit = performance.now();
-                // lastText = newText;
-                // reloaded = false;
+                // reload(newText);
+                lastEdit = performance.now();
+                lastText = newText;
+                reloaded = false;
             }
 
-            // if (!reloaded /* && performance.now() > lastEdit + timeBeforeReload * 1e3*/ ) {
-            //     reload(newText);
-            //     reloaded = true;
-            // }
+            if (!reloaded && performance.now() > lastEdit + timeBeforeReload * 1e3 ) {
+                reload(newText);
+                reloaded = true;
+                
+                console.log("Reloading due to user input.");
+            }
         }
 
         let scrubberActive = false;
         let scrubberAnchorValue = 0;
+        let lastScrubberLocalValue = 0;
         let isMouseDown = false;
 
         function resetNumberScrubber() {
@@ -210,33 +215,40 @@
             
             // Otherwise:
             // If the scrubber is already active, set the character to the anchor + scrubber value
+            let scrubberLocalValue = parseInt(scrubber.value);
             if (scrubberActive) {
+                if (scrubberLocalValue != lastScrubberLocalValue) {
+                    lastScrubberLocalValue = scrubberLocalValue;
 
-                let value = scrubberAnchorValue + parseInt(scrubber.value);
+                    let value = scrubberAnchorValue + scrubberLocalValue;
 
-                let furthestBackSelection = backSearchIndex + 1 + (value < 0 ? 1 : 0);
+                    let furthestBackSelection = backSearchIndex + 1 + (value < 0 ? 1 : 0);
 
-                view.dispatch({
-                    changes: [
-                        {
-                            from: backSearchIndex + 1,
-                            to: forwardSearchIndex,
-                            insert: Text.of([value.toString()])
+                    view.dispatch({
+                        changes: [
+                            {
+                                from: backSearchIndex + 1,
+                                to: forwardSearchIndex,
+                                insert: Text.of([value.toString()])
+                            }
+                        ],
+                        selection: {
+                            anchor: furthestBackSelection,
+                            head: furthestBackSelection
                         }
-                    ],
-                    selection: {
-                        anchor: furthestBackSelection,
-                        head: furthestBackSelection
-                    }
-                });
+                    });
 
-                reload(view.state.doc.toString());
+                    console.log("Reloading due to scrubber.");
+
+                    reload(view.state.doc.toString());
+                }
             } 
             
             // if the scrubber is not active, set the anchor
             else if (isMouseDown) {
                 scrubberActive = true;
                 scrubberAnchorValue = curValue;
+                lastScrubberLocalValue = parseInt(scrubber.value);
             }
             
         }

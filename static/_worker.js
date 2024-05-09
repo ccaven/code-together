@@ -163,6 +163,7 @@ height = 600;
 let canvas;
 let ctx;
 let raf;
+let dummyFn = () => {};
 
 self.addEventListener("message", (event) => {
     if (event.data.type != "init") {
@@ -176,24 +177,18 @@ self.addEventListener("message", (event) => {
         ctx = canvas.getContext('2d');
     }
 
-    // Cancel all existing animation frames
     {
-        cancelAnimationFrame(raf);
-        
-    }
-
-    {
-        mouseReleased = () => {};
-        mouseScrolled = () => {};
-        mouseClicked = () => {};
-        mouseOut = () => {};
-        mouseOver = () => {};
-        mouseMoved = () => {};
-        keyPressed = () => {};
-        keyReleased = () => {};
-        mouseOver = () => {};
-        mouseOut = () => {};
-        draw = () => {};
+        mouseReleased = dummyFn;
+        mouseScrolled = dummyFn;
+        mouseClicked = dummyFn;
+        mouseOut = dummyFn;
+        mouseOver = dummyFn;
+        mouseMoved = dummyFn;
+        keyPressed = dummyFn;
+        keyReleased = dummyFn;
+        mouseOver = dummyFn;
+        mouseOut = dummyFn;
+        draw = dummyFn;
         mouseIsPressed = false;
         mouseButton = LEFT_BUTTON;
         mouseX = 0;
@@ -1288,14 +1283,21 @@ self.addEventListener("message", (event) => {
 
     {
         function isFn(fn) {
-            return !!fn && typeof fn == "function";
+            return !!fn && typeof fn == "function" && fn !== dummyFn;
         }
+
+        if (!isFn(mouseMoved) && !isFn(mousePressed) && !isFn(mouseReleased) && !isFn(draw)) {
+            cancelAnimationFrame(raf);
+            return;
+        }
+
 
         frameCount = 0;
         delta = 1000 / 60;
         then = performance.now();
         skiJSData.start = performance.now();
         function loop(time) {
+            console.log("I am a loop");
             raf = requestAnimationFrame(loop);
 
             delta = time - then;
@@ -1330,6 +1332,6 @@ self.addEventListener("message", (event) => {
         }
 
         cancelAnimationFrame(raf);
-        loop(performance.now());
+        raf = requestAnimationFrame(loop);
     }
 });
