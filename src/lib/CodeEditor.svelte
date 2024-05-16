@@ -170,8 +170,11 @@
         let isMouseDown = false;
 
         function resetNumberScrubber() {
-            scrubber.value = "0";
-            scrubberActive = false;
+            if (scrubberActive || scrubber.value != "0") {
+                scrubber.value = "0";
+                scrubberActive = false;
+                console.log("Reset number scrubber");
+            }
         }
 
         function numberScrubberLoop() {
@@ -195,6 +198,7 @@
 
             // make sure there are only numbers
             if (!(/^\d+$/.test(character))) {
+                // This is a problem. When we cross 0 it resets
                 resetNumberScrubber();
                 return;
             }
@@ -211,11 +215,15 @@
             let scrubberLocalValue = parseInt(scrubber.value);
             if (scrubberActive) {
                 if (scrubberLocalValue != lastScrubberLocalValue) {
-                    lastScrubberLocalValue = scrubberLocalValue;
-
+                    
                     let value = scrubberAnchorValue + scrubberLocalValue;
 
                     let furthestBackSelection = backSearchIndex + 1 + (value < 0 ? 1 : 0);
+
+                    if (curValue >= 0 && value < 0) {
+                        console.log("Should break");
+                        // furthestBackSelection -= 1;
+                    }
 
                     view.dispatch({
                         changes: [
@@ -234,6 +242,8 @@
                     console.log("Reloading due to scrubber.");
 
                     reload(view.state.doc.toString());
+                    
+                    lastScrubberLocalValue = scrubberLocalValue;
                 }
             } 
             

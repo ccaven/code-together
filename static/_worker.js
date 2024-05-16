@@ -161,6 +161,7 @@ width = 600;
 height = 600;
 
 let canvas;
+/** @type {CanvasRenderingContext2D} */
 let ctx;
 let raf;
 let dummyFn = () => {};
@@ -1273,6 +1274,8 @@ self.addEventListener("message", (event) => {
             };
         }();
     }
+
+    ctx.reset();
 
     background(255, 255, 255);
     fill(255, 255, 255);
